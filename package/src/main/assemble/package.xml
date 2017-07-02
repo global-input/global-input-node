@@ -16,11 +16,17 @@
                    <outputDirectory>/app</outputDirectory>
            </fileSet>
            <fileSet>
+                   <directory>../node/</directory>
+                   <includes>
+                       <include>**/*</include>
+                   </includes>
+                   <outputDirectory>/node</outputDirectory>
+           </fileSet>
+           <fileSet>
                    <directory>../</directory>
                    <includes>
                        <include>*.sh</include>
-                       <include>*.yml</include>
-                       <include>Dockerfile</include>
+                       <include>*.yml</include>   
                    </includes>
                    <outputDirectory>/</outputDirectory>
            </fileSet>

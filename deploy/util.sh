@@ -21,7 +21,7 @@ createFolders(){
     createUniqueidforfilename
     echo "creating the script for creating folder: /tmp/script_$uniqueidforfilename.sh"   
     echo "mkdir -p $destzipfolder" > /tmp/script_$uniqueidforfilename.sh
-    echo "mkdir -p $destzipfolder/bnginx/var/www/html" >> /tmp/script_$uniqueidforfilename.sh    
+    echo "mkdir -p $destzipfolder/node/app" > /tmp/script_$uniqueidforfilename.sh        
     executeScript /tmp/script_$uniqueidforfilename.sh
 }
 
@@ -46,11 +46,8 @@ unzipAndReplaceVariables(){
     echo "cd $destzipfolder" > /tmp/script_$uniqueidforfilename.sh
     echo "unzip -o $zipfilename" >> /tmp/script_$uniqueidforfilename.sh
     
-    echo  'sed -i -e "s,@@@db_user@@@,'$db_user',g" mysql/box-scripts/mysql.env' >> /tmp/script_$uniqueidforfilename.sh
-    echo  'sed -i -e "s,@@@db_password@@@,'$db_password',g" mysql/box-scripts/mysql.env ' >> /tmp/script_$uniqueidforfilename.sh
-    
-    echo  'sed -i -e "s,@@@db_user@@@,'$db_user',g" mysql/box-scripts/mysql.env' >> /tmp/script_$uniqueidforfilename.sh
-    echo  'sed -i -e "s,@@@db_password@@@,'$db_password',g" mysql/box-scripts/mysql.env ' >> /tmp/script_$uniqueidforfilename.sh      
+    #echo  'sed -i -e "s,@@@db_user@@@,'$db_user',g" mysql/box-scripts/mysql.env' >> /tmp/script_$uniqueidforfilename.sh
+          
     
 }
 makeSchellScriptExecutable(){
@@ -63,13 +60,7 @@ makeSchellScriptExecutable(){
 createSCriptFormakeSchellScriptExecutable(){
     uniqueidforfilename=$1
     echo "creating the script for making executable: /tmp/script_$uniqueidforfilename.sh"   
-    echo "chmod u+x bdocker/*.sh" > /tmp/script_$uniqueidforfilename.sh
-    echo "chmod u+x bdocker/bmule/*.sh" >> /tmp/script_$uniqueidforfilename.sh
-    echo "chmod u+x bdocker/bmule/opt/mule/box-scripts/*.sh" >> /tmp/script_$uniqueidforfilename.sh   
-    echo "chmod u+x bdocker/bnginx/*.sh" >> /tmp/script_$uniqueidforfilename.sh
-    echo "chmod u+x bdocker/bscripts/*.sh" >> /tmp/script_$uniqueidforfilename.sh
-    echo "chmod u+x bdocker/mysql/*.sh" >> /tmp/script_$uniqueidforfilename.sh
-    echo "chmod u+x bdocker/mysql/box-scripts/*.sh" >> /tmp/script_$uniqueidforfilename.sh
+    echo "cd  $destzipfolder && chmod u+x *.sh" > /tmp/script_$uniqueidforfilename.sh    
 }
 
 createDeployScript(){
@@ -78,6 +69,7 @@ createDeployScript(){
     echo "deploy/deploy.sh $4 $5 $2" >> deploy/deploy_to_$1.sh
     chmod u+x deploy/deploy_to_$1.sh
 }
+
 
 createUniqueidforfilename(){
   if [ -z "${uniqueidforfilename+x}" ] 
@@ -88,4 +80,10 @@ createUniqueidforfilename(){
         export uniqueidforfilename=$((uniqueidforfilename+1))
  fi
 }
-  
+
+copyTheAppToDockerFolder(){
+    createUniqueidforfilename
+    echo "creating the script for copyTheAppToDockerFolder: /tmp/script_$uniqueidforfilename.sh"   
+    echo "rsync -azvv  $destzipfolder/app/ $destzipfolder/node/app/" > /tmp/script_$uniqueidforfilename.sh            
+    executeScript /tmp/script_$uniqueidforfilename.sh
+} 

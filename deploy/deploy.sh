@@ -8,4 +8,4 @@ createFolders
 uploadZipFile
 unzipZipFile
 makeSchellScriptExecutable
-uploadSSLCertificated
+copyTheAppToDockerFolder
