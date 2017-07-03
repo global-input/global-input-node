@@ -7,4 +7,7 @@ services:
     container_name: global_input_node
     ports:
       - "1337:1337"    
-    
+networks:
+   default:
+     external:
+       name: iterativesolution_default
