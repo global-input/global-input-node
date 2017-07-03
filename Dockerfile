@@ -2,7 +2,7 @@
 FROM node:8.1.2
 
 # The application port.
-EXPOSE 8000
+EXPOSE 1337
 
 ENV NODE_ENV="production"
 
@@ -30,6 +30,6 @@ ENTRYPOINT ["node", "/app/server.js"]
 # entry point.
 #
 # This assumes that a configuration file has been mounted.
-#CMD ["--config", "/app/config/config.json"]
+CMD ["--config", "/app/config/config.json"]
 
 

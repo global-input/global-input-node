@@ -1,12 +1,35 @@
+var fs = require('fs');
+const minimist     = require('minimist');
+
 var globalInputMessenger={
-    sockets:[],
-    io:{},
+    sockets:[],  
+    configPath:"config/config.json",
+    init:function(io, argv){
+       this.io=io;
+      // this.processArguments(argv);
+    },
+    processArguments:function(argv){              
+        var  pathToConfigFile = minimist(argv).config;
+        console.log("pathToConfigFile:"+pathToConfigFile);
+        if(pathToConfigFile && fs.existsSync(pathToConfigFile)){
+            console.log("loading the configuration:"+pathToConfigFile)
+            configPath=pathToConfigFile;
+            AWS.config.loadFromPath(pathToConfigFile);
+            console.log("AWS also configured with  the configuration:"+pathToConfigFile)
+        }            
+        else{
+            console.log("not exists:"+pathToConfigFile);
+        }
+    },
+    loadConifg: function() {
+        this.config = JSON.parse(fs.readFileSync(configPath, 'utf8'));            
+    },
     loadIndexFile:function(req,res){
         console.log("------received test request----");
         res.sendFile(__dirname+"/index.html");  
     },
-    logError:function(err, req, res, next){
-        console.error(err.stack)
+    logger:function(err, req, res, next){
+        console.log(" GOT Request:::::::::!!!!");
         next(err)  
     },
     
