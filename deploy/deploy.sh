@@ -9,3 +9,4 @@ uploadZipFile
 unzipZipFile
 makeSchellScriptExecutable
 copyTheAppToDockerFolder
+buildAndStartDocker

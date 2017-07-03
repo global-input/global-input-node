@@ -17,7 +17,7 @@
     <ul id="messages"></ul>
     
     <div id="messageContent">
-      <input id="clientId" autocomplete="off" /><button>Connect</button>
+      <input id="clientId" autocomplete="off" /><button id="connect">Connect</button>
     </div>
     <div>
     <div>
@@ -36,8 +36,8 @@
     $(document).ready(function(){
     //    var getuniqueurl=window.location.href+"global-input/clients";
     
+       // var url='/global-input/clients';
         var url='http://localhost:8080/global-input/clients';
-        
        
        $.ajax({ method:"POST",
                 url:url, 
@@ -54,7 +54,7 @@
         
         var socket=null;
         
-          $('#clientId').click(function(e){
+          $('#connect').click(function(e){
             e.preventDefault();
             if(socket){
                 socket.disconnect();

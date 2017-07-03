@@ -1,4 +1,4 @@
-projectName="global-input-node"
+projectName="global-input-messenger"
 
 getProjectVersionFromPom(){
   projectversion=`grep -A 0 -B 2 "<packaging>" pom.xml  | grep version  | cut -d\> -f 2 | cut -d\< -f 1`
@@ -16,6 +16,12 @@ executeScript(){
    ssh $deploy_to_username@$deploy_to_hostname 'bash -s' < $1      
    echo "remote execution completed"   
 }
+executeDeployedScriptOnServer(){
+   echo "executing the deployed script $1 remotely  on  $deploy_to_username@$deploy_to_hostname "
+   ssh $deploy_to_username@$deploy_to_hostname "cd $destzipfolder && ./$1"      
+   echo "remote execution completed"   
+}
+
   
 createFolders(){
     createUniqueidforfilename
@@ -87,3 +93,6 @@ copyTheAppToDockerFolder(){
     echo "rsync -azvv  $destzipfolder/app/ $destzipfolder/node/app/" > /tmp/script_$uniqueidforfilename.sh            
     executeScript /tmp/script_$uniqueidforfilename.sh
 } 
+buildAndStartDocker(){  
+    executeDeployedScriptOnServer start.sh
+}
