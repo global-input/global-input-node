@@ -2,7 +2,7 @@
 
     <modelVersion>4.0.0</modelVersion>
     <groupId>uk.co.globalinput</groupId>
-    <artifactId>global-input-node-parent</artifactId>
+    <artifactId>global-input-messenger-parent</artifactId>
     <version>1.0.1-SNAPSHOT</version>
     <packaging>pom</packaging>
 
@@ -24,7 +24,7 @@
     </distributionManagement>
 
     <scm>
-        <connection>scm:ssh://git@github.com:global-input/global-input-node.git</connection>
+        <connection>scm:ssh://git@github.com:global-input/global-input-messenger.git</connection>
     </scm>
 
     <properties>          

@@ -18,6 +18,17 @@ app.get("/", function(req,res){
    res.sendFile(__dirname+"/index.html");
 });
 
+app.get("/global-input-messenger/", function(req,res){
+    console.log("------received test request----");
+    res.sendFile(__dirname+"/index.html");
+ });
+
+function logErrors (err, req, res, next) {
+    console.error(err.stack)
+    next(err)
+  }
+
+app.use(logErrors);
 
 io.on("connect", function(socket){
     sockets.push(socket);
