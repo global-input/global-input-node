@@ -12,7 +12,7 @@ var websocketport = 1337;
 var env_port = 8080; 
 var host = 'external-api.host'; 
 
-globalInputMessenger.io=io;
+globalInputMessenger.init(io);
 
 
 
@@ -23,9 +23,11 @@ app.get("/", function(req,res){
 
 app.get("/global-input-messenger/", function(req,res){
     globalInputMessenger.loadIndexFile(req,res);
- });
+});
 
-app.use(globalInputMessenger.logError.bind(globalInputMessenger));
+    app.use(globalInputMessenger.logger.bind(globalInputMessenger));
+
+
 
 io.on("connect", globalInputMessenger.onConnect.bind(globalInputMessenger));
   
