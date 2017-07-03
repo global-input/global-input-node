@@ -6,53 +6,30 @@ const io=require('socket.io')(http);
 
 const querystring = require('querystring');
 
+var globalInputMessenger=require('./messenger.js');
+
 var websocketport = 1337;
 var env_port = 8080; 
 var host = 'external-api.host'; 
 
-var sockets=[];
+globalInputMessenger.io=io;
+
 
 
 
 app.get("/", function(req,res){
-   res.sendFile(__dirname+"/index.html");
+    globalInputMessenger.loadIndexFile(req,res);
 });
 
 app.get("/global-input-messenger/", function(req,res){
-    console.log("------received test request----");
-    res.sendFile(__dirname+"/index.html");
+    globalInputMessenger.loadIndexFile(req,res);
  });
 
-function logErrors (err, req, res, next) {
-    console.error(err.stack)
-    next(err)
-  }
+app.use(globalInputMessenger.logError.bind(globalInputMessenger));
 
-app.use(logErrors);
-
-io.on("connect", function(socket){
-    sockets.push(socket);
-    console.log(" a user connected:"+socket.id+":"+sockets.length);
-  socket.on("disconnect", function(){
-    
-    var pos=sockets.indexOf(socket);
-    if(pos>=0){
-        sockets.splice(pos, 1);
-    }
-    console.log("useer disconnected:"+socket.id+":"+":"+sockets.length);
-  });
-  
-  socket.on("sendToClient", function(data){
-      console.log("Received the data:"+data);
-      const parseData=JSON.parse(data);
-      if(parseData.clientId){
-          io.emit(parseData.clientId, JSON.stringify(parseData.message));
-      }      
-  });
+io.on("connect", globalInputMessenger.onConnect.bind(globalInputMessenger));
   
   
-  
-});
 
 var httpServer= http.listen(websocketport,function(){
   console.log("websocket is listenning on:"+websocketport);
