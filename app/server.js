@@ -8,33 +8,21 @@ const querystring = require('querystring');
 
 var globalInputMessenger=require('./messenger.js');
 
-var websocketport = 1337;
-var env_port = 8080; 
-var host = 'external-api.host'; 
 
-globalInputMessenger.init(io);
+ 
+ 
 
+globalInputMessenger.init(io,process.argv.slice(2));
 
-
-
-app.get("/", function(req,res){
-    globalInputMessenger.loadIndexFile(req,res);
-});
-
-app.get("/global-input-messenger/", function(req,res){
-    globalInputMessenger.loadIndexFile(req,res);
-});
-
-    app.use(globalInputMessenger.logger.bind(globalInputMessenger));
+app.use(globalInputMessenger.logger.bind(globalInputMessenger));
 
 
 
-io.on("connect", globalInputMessenger.onConnect.bind(globalInputMessenger));
-  
+app.get("/",globalInputMessenger.loadIndexFile);  
   
 
-var httpServer= http.listen(websocketport,function(){
-  console.log("websocket is listenning on:"+websocketport);
+var httpServer= http.listen(globalInputMessenger.config.port,function(){
+  console.log("websocket is listenning on:"+globalInputMessenger.config.port);
 });
 
 
