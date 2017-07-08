@@ -2,7 +2,7 @@
     <parent>
 		<groupId>uk.co.globalinput</groupId>
         <artifactId>global-input-messenger-parent</artifactId>
-        <version>1.0.5-SNAPSHOT</version>
+        <version>1.0.6-SNAPSHOT</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
