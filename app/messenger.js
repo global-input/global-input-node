@@ -29,15 +29,19 @@ var globalInputMessenger={
         console.log("pathToConfigFile:"+this.configPath);
     },
     
-    loadConfig:function(){       
-        if(this.configPath && fs.existsSync(this.configPath)){
-            console.log("loading the configuration:"+this.configPath)            
+    loadConfig:function(){
+        var configPath=this.configPath;
+        if(configPath && (!configPath.startsWith("/"))){
+            configPath=__dirname+"/"+configPath;            
+        }
+        console.log("checking the config file:"+configPath);
             
-            //this.config=require(__dirname+"/"+pathToConfigFile);
-            this.config = JSON.parse(fs.readFileSync(this.configPath, 'utf8'));            
+        if(configPath && fs.existsSync(configPath)){
+            console.log("loading the configuration:"+configPath);            
+            this.config = JSON.parse(fs.readFileSync(configPath, 'utf8'));            
         }            
         else{
-            console.log("not exists:"+this.configPath);
+            console.log("not exists:"+configPath);
         }
     },
     
@@ -57,7 +61,7 @@ var globalInputMessenger={
         socket.on("disconnect", function(){        
             that.onDisconnect(socket);
         });
-        socket.on("sendToClient", this.onReceiveSendeToClientMessage.bind(this));
+        socket.on("sendToSession", this.onReceiveSendMessageToSession.bind(this));
     },
     onDisconnect:function(socket){
         var pos=this.sockets.indexOf(socket);
@@ -66,12 +70,25 @@ var globalInputMessenger={
         }
         console.log("useer disconnected:"+socket.id+":"+":"+this.sockets.length);
     },
-    onReceiveSendeToClientMessage:function(data){
-        console.log("Received the data:"+data);
-        const parseData=JSON.parse(data);
-        if(parseData.clientId){
-            this.ionamespace.emit(parseData.clientId, JSON.stringify(parseData.message));
+    onReceiveSendMessageToSession:function(content){                
+        try{
+            const message=JSON.parse(content);            
+            const session=message.session;
+            delete message.session;
+            var messageToSend=JSON.stringify(message);
+            
+            if(session){
+                console.log("sending the message:"+messageToSend +" to:"+session)
+                this.ionamespace.emit(session,messageToSend);
+            }
+            else{
+                console.error("onReceiveSendeToClientMessage:missing session in:"+content);
+            }            
         }
+        catch(error){
+           console.error("onReceiveSendeToClientMessage:"+error+ " for the content:"+content); 
+        }
+        
     }
         
 };

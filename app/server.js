@@ -18,7 +18,7 @@ app.use(globalInputMessenger.logger.bind(globalInputMessenger));
 
 
 
-app.get("/",globalInputMessenger.loadIndexFile);  
+//app.get("/",globalInputMessenger.loadIndexFile);  
   
 
 var httpServer= http.listen(globalInputMessenger.config.port,function(){
