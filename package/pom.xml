@@ -2,7 +2,7 @@
     <parent>
 		<groupId>uk.co.globalinput</groupId>
         <artifactId>global-input-node-parent</artifactId>
-        <version>1.1.1-SNAPSHOT</version>
+        <version>1.1.2-SNAPSHOT</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
