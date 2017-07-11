@@ -1,5 +1,5 @@
 {
-  "name": "global-init",
+  "name": "global-input-node",
   "version": "1.0.0",
   "description": "Global Input Node Server",
   "main": "server.js",
