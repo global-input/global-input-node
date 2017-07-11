@@ -1,37 +1,37 @@
-projectName="global-input-messenger"
+projectName="global-input-node"
 
 getProjectVersionFromPom(){
   projectversion=`grep -A 0 -B 2 "<packaging>" pom.xml  | grep version  | cut -d\> -f 2 | cut -d\< -f 1`
-  export projectversion  
+  export projectversion
 }
 
 buildVariables(){
   export zipfilename="$projectName-$projectversion.zip"
   export sourcezipfilepath="package/target/$zipfilename"
-  export destzipfolder="$projectName"   
+  export destzipfolder="$projectName"
 }
-  
+
 executeScript(){
    echo "executing the script $1 remotely  on  $deploy_to_username@$deploy_to_hostname "
-   ssh $deploy_to_username@$deploy_to_hostname 'bash -s' < $1      
-   echo "remote execution completed"   
+   ssh $deploy_to_username@$deploy_to_hostname 'bash -s' < $1
+   echo "remote execution completed"
 }
 executeDeployedScriptOnServer(){
    echo "executing the deployed script $1 remotely  on  $deploy_to_username@$deploy_to_hostname "
-   ssh $deploy_to_username@$deploy_to_hostname "cd $destzipfolder && ./$1"      
-   echo "remote execution completed"   
+   ssh $deploy_to_username@$deploy_to_hostname "cd $destzipfolder && ./$1"
+   echo "remote execution completed"
 }
 
-  
+
 createFolders(){
     createUniqueidforfilename
-    echo "creating the script for creating folder: /tmp/script_$uniqueidforfilename.sh"   
+    echo "creating the script for creating folder: /tmp/script_$uniqueidforfilename.sh"
     echo "mkdir -p $destzipfolder" > /tmp/script_$uniqueidforfilename.sh
-    echo "mkdir -p $destzipfolder/node/app" > /tmp/script_$uniqueidforfilename.sh        
+    echo "mkdir -p $destzipfolder/node/app" > /tmp/script_$uniqueidforfilename.sh
     executeScript /tmp/script_$uniqueidforfilename.sh
 }
 
-uploadZipFile(){     
+uploadZipFile(){
     echo "uploading the $sourcezipfilepath to  $deploy_to_username@$deploy_to_hostname:$destzipfolder/"
     scp $sourcezipfilepath $deploy_to_username@$deploy_to_hostname:$destzipfolder/
 }
@@ -39,7 +39,7 @@ uploadZipFile(){
 uploadSSLCertificated(){
     scp $ssl_certificate_location/* $deploy_to_username@$deploy_to_hostname:bdocker/bnginx/etc/nginx/ssl/
 }
-unzipZipFile(){    
+unzipZipFile(){
       createUniqueidforfilename
       unzipAndReplaceVariables $uniqueidforfilename
       executeScript /tmp/script_$uniqueidforfilename.sh
@@ -47,26 +47,26 @@ unzipZipFile(){
 
 unzipAndReplaceVariables(){
     uniqueidforfilename=$1
-    
+
     echo "creating the script:/tmp/script_$uniqueidforfilename.sh"
     echo "cd $destzipfolder" > /tmp/script_$uniqueidforfilename.sh
     echo "unzip -o $zipfilename" >> /tmp/script_$uniqueidforfilename.sh
-    
+
     #echo  'sed -i -e "s,@@@db_user@@@,'$db_user',g" mysql/box-scripts/mysql.env' >> /tmp/script_$uniqueidforfilename.sh
-          
-    
+
+
 }
 makeSchellScriptExecutable(){
     createUniqueidforfilename
     createSCriptFormakeSchellScriptExecutable $uniqueidforfilename
-    
+
     executeScript /tmp/script_$uniqueidforfilename.sh
 }
 
 createSCriptFormakeSchellScriptExecutable(){
     uniqueidforfilename=$1
-    echo "creating the script for making executable: /tmp/script_$uniqueidforfilename.sh"   
-    echo "cd  $destzipfolder && chmod u+x *.sh" > /tmp/script_$uniqueidforfilename.sh    
+    echo "creating the script for making executable: /tmp/script_$uniqueidforfilename.sh"
+    echo "cd  $destzipfolder && chmod u+x *.sh" > /tmp/script_$uniqueidforfilename.sh
 }
 
 createDeployScript(){
@@ -78,10 +78,10 @@ createDeployScript(){
 
 
 createUniqueidforfilename(){
-  if [ -z "${uniqueidforfilename+x}" ] 
-  then 
+  if [ -z "${uniqueidforfilename+x}" ]
+  then
         uniqueidforfilename=$(date +%s)
-     
+
  else
         export uniqueidforfilename=$((uniqueidforfilename+1))
  fi
@@ -89,10 +89,10 @@ createUniqueidforfilename(){
 
 copyTheAppToDockerFolder(){
     createUniqueidforfilename
-    echo "creating the script for copyTheAppToDockerFolder: /tmp/script_$uniqueidforfilename.sh"   
-    echo "rsync -azvv  $destzipfolder/app/ $destzipfolder/node/app/" > /tmp/script_$uniqueidforfilename.sh            
+    echo "creating the script for copyTheAppToDockerFolder: /tmp/script_$uniqueidforfilename.sh"
+    echo "rsync -azvv  $destzipfolder/app/ $destzipfolder/node/app/" > /tmp/script_$uniqueidforfilename.sh
     executeScript /tmp/script_$uniqueidforfilename.sh
-} 
-buildAndStartDocker(){  
+}
+buildAndStartDocker(){
     executeDeployedScriptOnServer start.sh
 }

@@ -1,12 +1,12 @@
 version: '2'
 services:
 
-  global_input_messenger:    
+  global_input_node:
     build: .
-    image: dilshat/global_input_messenger
-    container_name: global_input_messenger
+    image: dilshat/global_input_node
+    container_name: global_input_node
     ports:
-      - "1337:1337"    
+      - "1337:1337"
 networks:
    default:
      external:
