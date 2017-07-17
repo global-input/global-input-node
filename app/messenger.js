@@ -172,16 +172,33 @@ var globalInputMessenger={
     },
     processJoinResponseMessage:function(registerItem,joinMessage,targetClient,responseMessage){
           if(responseMessage.allow){
+
                 const inputMessageListener=function(inputMessage){
-                  console.log("forwarding the input message:"+targetClient.session+" message:"+inputMessage);                    
+                  console.log("forwarding the input message:"+targetClient.session+" message:"+inputMessage);
                     targetClient.socket.emit(targetClient.session+"/input",inputMessage);
                 };
-                registerItem.socket.on("inputMessage",inputMessageListener);
-                targetClient.socket.on("disconnect", function(){
-                      registerItem.socket.removeListener("inputMessage",inputMessageListener);
-                      console.log("inputMessage messageListener is removed");
+                const reverseInputMessageListener=function(inputMessage){
+                    console.log("forwarding the reverse input message:"+targetClient.session+" message:"+inputMessage);
+                    registerItem.socket.emit(targetClient.session+"/input",inputMessage);
+                }
+                const metadataListener=function(metadata){
+                    console.log("forwarding the metadata:"+medata);
+                    registerItem.socket.emit(targetClient.session+"/metadata",metadata);
+                }
 
+                registerItem.socket.on(targetClient.session+"/input",inputMessageListener);
+                targetClient.socket.on(targetClient.session+"/input",reverseInputMessageListener);
+                targetClient.socket.on(targetClient.session+"/metadata",metadataListener);
+                targetClient.socket.on("disconnect", function(){
+                      registerItem.socket.removeListener(targetClient.session+"/input",inputMessageListener);
+                      console.log("inputMessage messageListener is removed");
                 });
+                registerItem.socket.on("disconnect", function(){
+                      targetClient.socket.removeListener(targetClient.session+"/input",reverseInputMessageListener);
+                      targetClient.socket.removeListener(targetClient.session+"/metadata",metadataListener);
+                      console.log("reverse inputMessage messageListener is removed");
+                });
+
                 registerItem.socket.on("disconnect", function(){
                   targetClient.socket.emit(targetClient.session+"/leave",JSON.stringify(joinMessage));
                 });
