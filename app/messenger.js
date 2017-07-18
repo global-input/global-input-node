@@ -30,7 +30,6 @@ var globalInputMessenger={
        else{
            this.ionamespace=io;
        }
-       console.log("(*(((()))))")
        this.ionamespace.on("connect", this.onConnect.bind(this));
     },
     processArguments:function(argv){
@@ -85,7 +84,6 @@ var globalInputMessenger={
     },
 
     onConnect:function(socket){
-        console.log("*********");
         logToConsole(" a socket connected:" +socket.id);
         socket.on("disconnect", function(){
             logToConsole("the socket is diconnected:"+socket.id);
@@ -143,16 +141,17 @@ var globalInputMessenger={
             socket.emit("registered",JSON.stringify(registeredMessage));
     },
     onInputPermission:function(registerItem, inputPermissionMessage){
+            
             if(registerItem.client!==inputPermissionMessage.client){
-                  this.log("wrong client vaue");
+                  logToConsole("wrong client vaue:"+registerItem.client+":"+inputPermissionMessage.client);
                   return;
             }
             if(registerItem.session!==inputPermissionMessage.session){
-                  this.log("wrong session vaue");
+                  logToConsole("wrong session vaue");
                   return;
             }
             if(!inputPermissionMessage.inputSession){
-              this.log("input permission message missing input session");
+              logToConsole("input permission message missing input session");
               return;
             }
             const receiver=this.registry.get(inputPermissionMessage.inputSession);
