@@ -1,7 +1,14 @@
 var fs = require('fs');
 const minimist     = require('minimist');
 
+var logToConsole=function(message){
+      console.log(new Date()+":"+message);
+}
+var errorToConsole=function(message){
+  console.error(new Date()+":"+message);
+}
 var globalInputMessenger={
+
   createGUID:function() {
      function s4() {
        return Math.floor((1 + Math.random()) * 0x10000)
@@ -29,12 +36,12 @@ var globalInputMessenger={
         var  pathToConfigFile = minimist(argv).config;
         if(!pathToConfigFile){
             this.configPath="config/config.json";
-            console.log("using fallback config file path")
+            logToConsole("using fallback config file path")
         }
         else{
             this.configPath=pathToConfigFile;
         }
-        console.log("pathToConfigFile:"+this.configPath);
+        logToConsole("pathToConfigFile:"+this.configPath);
     },
 
     loadConfig:function(){
@@ -42,27 +49,27 @@ var globalInputMessenger={
         if(configPath && (!configPath.startsWith("/"))){
             configPath=__dirname+"/"+configPath;
         }
-        console.log("checking the config file:"+configPath);
+        logToConsole("checking the config file:"+configPath);
 
         if(configPath && fs.existsSync(configPath)){
-            console.log("loading the configuration:"+configPath);
+            logToConsole("loading the configuration:"+configPath);
             this.config = JSON.parse(fs.readFileSync(configPath, 'utf8'));
         }
         else{
-            console.log("not exists:"+configPath);
+            logToConsole("not exists:"+configPath);
         }
     },
 
     loadIndexFile:function(req,res){
-        console.log("------received test request----");
+        logToConsole("------received test request----");
         res.sendFile(__dirname+"/index.html");
     },
     logger:function(err, req, res, next){
-        console.log(" GOT Request:::::::::!!!!");
+        logToConsole(" GOT Request:::::::::!!!!");
         next(err)
     },
     processError:function(error,message){
-      console.error(error+" "+message);
+      errorToConsole(error+" "+message);
       if(error&& error.stack){
         console.error(error.stack);
       }
@@ -77,33 +84,32 @@ var globalInputMessenger={
     },
 
     onConnect:function(socket){
-        console.log(" a socket connected:" +socket.id);
+        logToConsole(" a socket connected:" +socket.id);
         socket.on("disconnect", function(){
-            console.log("the socket is diconnected:"+socket.id);
+            logToConsole("the socket is diconnected:"+socket.id);
         });
         var that=this;
-        socket.on("register", function(registerMessage){
-          console.log("register message is received:"+registerMessage);
-          try{
-              that.register(socket,JSON.parse(registerMessage));
-          }
-          catch(error){
-              that.processError(error," in registerSocket");
-          }
-          socket.removeAllListeners("register");
-        });
-        const canRegisterMessage={
-              action:"register",
-              socketid:socket.id
+        var onRegister=function(registerMessage){
+              logToConsole("register message is received:"+registerMessage);
+              try{
+                  that.onRegister(socket,JSON.parse(registerMessage));
+              }
+              catch(error){
+                  that.processError(error," in registerSocket");
+              }
+              socket.removeAllListeners("register");
+        };
+        socket.on("register",onRegister);
+        const registerPermissionMessage={
+              result:"ok"
         }
-        socket.emit("canRegister", JSON.stringify(canRegisterMessage));
+        socket.emit("registerPermission", JSON.stringify(registerPermissionMessage));
     },
-    register:function(socket,request){
+    onRegister:function(socket,request){
             if(!this.isApiKeyValid(request.apikey)){
-              console.log("apikey is not valid:"+request.apikey)
+              logToConsole("apikey is not valid:"+request.apikey)
               return false;
             }
-
             var that=this;
             const registerItem={
                 socket:socket,
@@ -116,96 +122,95 @@ var globalInputMessenger={
             this.registry.set(registerItem.session,registerItem);
             socket.on("disconnect", function(){
                   that.registry.delete(registerItem.session);
-                  console.log("removed the register:"+registerItem.session+":"+that.registry.size);
+                  logToConsole("removed the register:"+registerItem.session+":"+that.registry.size);
             });
-            console.log("registered:"+registerItem.session+":"+this.registry.size);
-            var randomkey=this.createGUID();
-            socket.on("joinSession", function(data){
-              console.log("joinSession Message is received:"+data);
+            logToConsole("registered:"+registerItem.session+":"+this.registry.size);
+            socket.on("inputPermision", function(data){
+              logToConsole("inputPermision Message is received:"+data);
                try{
-                    const joinSessionMessage=JSON.parse(data);
-                    if(joinSessionMessage.randomkey!==randomkey){
-                      console.log("random key does not match:"+joinSessionMessage.randomkey);
-                      return;
-                    }
-                    that.joinSession(registerItem,joinSessionMessage);
+                    that.onInputPermission(registerItem,JSON.parse(data));
                   }
                   catch(error){
                     that.processError(error," in requestJoin");
                   }
-                  socket.removeAllListeners("requestToJoin");
+                  socket.removeAllListeners("inputPermision");
             });
-
-            var canJoin={
-                  action:"join",
-                  randomkey
+            var registeredMessage={
+                  result:"ok",
             }
-            socket.emit("canJoin",JSON.stringify(canJoin));
+            socket.emit("registered",JSON.stringify(registeredMessage));
     },
-    joinSession:function(registerItem, joinMessage){
-            const targetClient=this.registry.get(joinMessage.session);
-            if(targetClient==null){
-                console.log("target client does not exist for:"+joinMessage.session);
+    onInputPermission:function(registerItem, inputPermissionMessage){
+            
+            if(registerItem.client!==inputPermissionMessage.client){
+                  logToConsole("wrong client vaue:"+registerItem.client+":"+inputPermissionMessage.client);
+                  return;
+            }
+            if(registerItem.session!==inputPermissionMessage.session){
+                  logToConsole("wrong session vaue");
+                  return;
+            }
+            if(!inputPermissionMessage.inputSession){
+              logToConsole("input permission message missing input session");
+              return;
+            }
+            const receiver=this.registry.get(inputPermissionMessage.inputSession);
+            if(receiver==null){
+                logToConsole("there is not such receiver:"+inputPermissionMessage.inputSession);
                 return;
             }
-            if(targetClient.sessionGroup !== joinMessage.sessionGroup){
-              console.log("sessionGroup does not match:"+joinMessage.sessionGroup+"!="+targetClient.sessionGroup);
+            if(receiver.sessionGroup !== inputPermissionMessage.sessionGroup){
+              logToConsole("sessionGroup does not match:"+inputPermissionMessage.sessionGroup+"!="+receiver.sessionGroup);
               return;
             };
-            this.listenOnJoinMessageResponse(targetClient,registerItem,joinMessage);
-            targetClient.socket.emit(joinMessage.session+"/join",JSON.stringify(joinMessage));
+            var that=this;
+            var onInputPermissionResult=function(data){
+              logToConsole("inputPermissionResult is received:"+data);
+               try{
+                    that.onInputPermissionResult(registerItem,inputPermissionMessage,receiver,JSON.parse(data));
+                  }
+                  catch(error){
+                    that.processError(error," in  processJoinRequestResult");
+
+                  }
+                  receiver.socket.removeListener(receiver.session+"/inputPermissionResult",onInputPermissionResult);
+            };
+            receiver.socket.on(receiver.session+"/inputPermissionResult", onInputPermissionResult);
+            receiver.socket.emit(receiver.session+"/inputPermission",JSON.stringify(inputPermissionMessage));
     },
-    listenOnJoinMessageResponse:function(targetClient, registerItem,joinMessage){
-      var that=this;
-      targetClient.socket.on("joinResponse", function(response){
-        console.log("joinResponse is received:"+response);
 
-         try{
-              that.processJoinResponseMessage(registerItem,joinMessage,targetClient,JSON.parse(response));
-            }
-            catch(error){
-              that.processError(error," in  processJoinRequestResult");
-
-            }
-            targetClient.socket.removeAllListeners("joinResponse");
-      });
-    },
-    processJoinResponseMessage:function(registerItem,joinMessage,targetClient,responseMessage){
-          if(responseMessage.allow){
-
+    onInputPermissionResult:function(registerItem,inputPermissionMessage,receiver,inputPermissionResult){
+          if(inputPermissionResult.allow){
                 const inputMessageListener=function(inputMessage){
-                  console.log("forwarding the input message:"+targetClient.session+" message:"+inputMessage);
-                    targetClient.socket.emit(targetClient.session+"/input",inputMessage);
+                  logToConsole("forwarding the input message:"+receiver.session+" message:"+inputMessage);
+                    receiver.socket.emit(receiver.session+"/input",inputMessage);
                 };
                 const reverseInputMessageListener=function(inputMessage){
-                    console.log("forwarding the reverse input message:"+targetClient.session+" message:"+inputMessage);
-                    registerItem.socket.emit(targetClient.session+"/input",inputMessage);
+                    logToConsole("forwarding the reverse input message:"+receiver.session+" message:"+inputMessage);
+                    registerItem.socket.emit(receiver.session+"/input",inputMessage);
                 }
                 const metadataListener=function(metadata){
-                    console.log("forwarding the metadata:"+medata);
-                    registerItem.socket.emit(targetClient.session+"/metadata",metadata);
+                    logToConsole("forwarding the metadata:"+medata);
+                    registerItem.socket.emit(receiver.session+"/metadata",metadata);
                 }
 
-                registerItem.socket.on(targetClient.session+"/input",inputMessageListener);
-                targetClient.socket.on(targetClient.session+"/input",reverseInputMessageListener);
-                targetClient.socket.on(targetClient.session+"/metadata",metadataListener);
-                targetClient.socket.on("disconnect", function(){
-                      registerItem.socket.removeListener(targetClient.session+"/input",inputMessageListener);
-                      console.log("inputMessage messageListener is removed");
+                registerItem.socket.on(receiver.session+"/input",inputMessageListener);
+                receiver.socket.on(receiver.session+"/input",reverseInputMessageListener);
+                receiver.socket.on(receiver.session+"/metadata",metadataListener);
+                receiver.socket.on("disconnect", function(){
+                      registerItem.socket.removeListener(receiver.session+"/input",inputMessageListener);
+                      logToConsole("inputMessage messageListener is removed");
                 });
                 registerItem.socket.on("disconnect", function(){
-                      targetClient.socket.removeListener(targetClient.session+"/input",reverseInputMessageListener);
-                      targetClient.socket.removeListener(targetClient.session+"/metadata",metadataListener);
-                      console.log("reverse inputMessage messageListener is removed");
+                      receiver.socket.removeListener(receiver.session+"/input",reverseInputMessageListener);
+                      receiver.socket.removeListener(receiver.session+"/metadata",metadataListener);
+                      receiver.socket.emit(receiver.session+"/leave",JSON.stringify(inputPermissionMessage));
+                      logToConsole("reverse inputMessage messageListener is removed");
                 });
-
-                registerItem.socket.on("disconnect", function(){
-                  targetClient.socket.emit(targetClient.session+"/leave",JSON.stringify(joinMessage));
-                });
-                registerItem.socket.emit("joinResponse",JSON.stringify(responseMessage));
+                registerItem.socket.emit(receiver.session+"/inputPermissionResult",JSON.stringify(inputPermissionResult));
           }
           else{
-              console.log("join message response says it is not allowed");
+              logToConsole("inputPermissionResult message says it is not allowed");
           }
 
     },
