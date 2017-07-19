@@ -1,5 +1,5 @@
-# global-input-node
-Global Input is the first commercial-grade, open-source software packages for enable applications running on multiple devices exchange information securely.
+# Global Input Software
+Global Input is the first commercial-grade, open-source software packages for enabling applications running on multiple devices to exchange information securely.
 
 
 ## License
