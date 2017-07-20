@@ -141,7 +141,7 @@ var globalInputMessenger={
             socket.emit("registered",JSON.stringify(registeredMessage));
     },
     onInputPermission:function(registerItem, inputPermissionMessage){
-            
+
             if(registerItem.client!==inputPermissionMessage.client){
                   logToConsole("wrong client vaue:"+registerItem.client+":"+inputPermissionMessage.client);
                   return;
@@ -176,6 +176,7 @@ var globalInputMessenger={
                   receiver.socket.removeListener(receiver.session+"/inputPermissionResult",onInputPermissionResult);
             };
             receiver.socket.on(receiver.session+"/inputPermissionResult", onInputPermissionResult);
+            logToConsole("sending inputPermission message to:"+receiver.session);
             receiver.socket.emit(receiver.session+"/inputPermission",JSON.stringify(inputPermissionMessage));
     },
 
