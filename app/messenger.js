@@ -150,13 +150,13 @@ var globalInputMessenger={
                   logToConsole("wrong session vaue");
                   return;
             }
-            if(!inputPermissionMessage.inputSession){
-              logToConsole("input permission message missing input session");
+            if(!inputPermissionMessage.connectSession){
+              logToConsole("input permission message missing connectSession");
               return;
             }
-            const receiver=this.registry.get(inputPermissionMessage.inputSession);
+            const receiver=this.registry.get(inputPermissionMessage.connectSession);
             if(receiver==null){
-                logToConsole("there is not such receiver:"+inputPermissionMessage.inputSession);
+                logToConsole("there is not such receiver:"+inputPermissionMessage.connectSession);
                 return;
             }
             if(receiver.sessionGroup !== inputPermissionMessage.sessionGroup){
@@ -176,7 +176,7 @@ var globalInputMessenger={
                   receiver.socket.removeListener(receiver.session+"/inputPermissionResult",onInputPermissionResult);
             };
             receiver.socket.on(receiver.session+"/inputPermissionResult", onInputPermissionResult);
-            logToConsole("sending inputPermission message to:"+receiver.session);
+            logToConsole("sending inputPermission message to:"+receiver.session+":"+receiver.client);
             receiver.socket.emit(receiver.session+"/inputPermission",JSON.stringify(inputPermissionMessage));
     },
 
