@@ -8,16 +8,6 @@ var errorToConsole=function(message){
   console.error(new Date()+":"+message);
 }
 var globalInputMessenger={
-
-  createGUID:function() {
-     function s4() {
-       return Math.floor((1 + Math.random()) * 0x10000)
-         .toString(16)
-         .substring(1);
-     }
-     return s4() + s4() + '-' + s4() + '-' + s4() + '-' +
-       s4() + '-' + s4() + s4() + s4();
-   },
     registry:new Map(),
     configPath:"config/config.json",
     init:function(io, argv){
