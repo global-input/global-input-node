@@ -8,16 +8,6 @@ var errorToConsole=function(message){
   console.error(new Date()+":"+message);
 }
 var globalInputMessenger={
-
-  createGUID:function() {
-     function s4() {
-       return Math.floor((1 + Math.random()) * 0x10000)
-         .toString(16)
-         .substring(1);
-     }
-     return s4() + s4() + '-' + s4() + '-' + s4() + '-' +
-       s4() + '-' + s4() + s4() + s4();
-   },
     registry:new Map(),
     configPath:"config/config.json",
     init:function(io, argv){
@@ -107,8 +97,20 @@ var globalInputMessenger={
     },
     onRegister:function(socket,request){
             if(!this.isApiKeyValid(request.apikey)){
-              logToConsole("apikey is not valid:"+request.apikey)
-              return false;
+              try{
+                      logToConsole("apikey is not valid:"+request.apikey)
+                      var registeredMessage={
+                            result:"failed",
+                            reason:"denied"
+                      }
+                      socket.emit("registered",JSON.stringify(registeredMessage));
+                      socket.disconnect(true);
+
+                  }
+                catch(error){
+                  logToConsole("error failed registered socket:"+error);
+                }
+                return false;
             }
             var that=this;
             const registerItem={
@@ -144,23 +146,27 @@ var globalInputMessenger={
 
             if(registerItem.client!==inputPermissionMessage.client){
                   logToConsole("wrong client vaue:"+registerItem.client+":"+inputPermissionMessage.client);
+                  this.sendErrorInputPermissionResult(registerItem,inputPermissionMessage,"Wrong client value");
                   return;
             }
             if(registerItem.session!==inputPermissionMessage.session){
                   logToConsole("wrong session vaue");
+                  this.sendErrorInputPermissionResult(registerItem,inputPermissionMessage,"Wrong session value");
                   return;
             }
             if(!inputPermissionMessage.connectSession){
               logToConsole("input permission message missing connectSession");
+              this.sendErrorInputPermissionResult(registerItem,inputPermissionMessage,"Missing connectSession value");
               return;
             }
             const receiver=this.registry.get(inputPermissionMessage.connectSession);
             if(receiver==null){
                 logToConsole("there is not such receiver:"+inputPermissionMessage.connectSession);
+                this.sendErrorInputPermissionResult(registerItem,inputPermissionMessage," there is no such receiver");
                 return;
             }
             if(receiver.sessionGroup !== inputPermissionMessage.sessionGroup){
-              logToConsole("sessionGroup does not match:"+inputPermissionMessage.sessionGroup+"!="+receiver.sessionGroup);
+              this.sendErrorInputPermissionResult(registerItem,inputPermissionMessage,"sessionGroup does not match");
               return;
             };
             var that=this;
@@ -171,7 +177,7 @@ var globalInputMessenger={
                   }
                   catch(error){
                     that.processError(error," in  processJoinRequestResult");
-
+                    that.sendErrorInputPermissionResult(registerItem,inputPermissionMessage,error);
                   }
                   receiver.socket.removeListener(receiver.session+"/inputPermissionResult",onInputPermissionResult);
             };
@@ -181,40 +187,50 @@ var globalInputMessenger={
     },
 
     onInputPermissionResult:function(registerItem,inputPermissionMessage,receiver,inputPermissionResult){
-          if(inputPermissionResult.allow){
-                const inputMessageListener=function(inputMessage){
+          if(!inputPermissionResult.allow){
+
+            this.sendErrorInputPermissionResult(registerItem,inputPermissionMessage,"client refused:"+inputPermissionResult.reason);
+            return;
+          }
+          const inputMessageListener=function(inputMessage){
                   logToConsole("forwarding the input message:"+receiver.session+" message:"+inputMessage);
                     receiver.socket.emit(receiver.session+"/input",inputMessage);
-                };
-                const reverseInputMessageListener=function(inputMessage){
+          };
+          const reverseInputMessageListener=function(inputMessage){
                     logToConsole("forwarding the reverse input message:"+receiver.session+" message:"+inputMessage);
                     registerItem.socket.emit(receiver.session+"/input",inputMessage);
-                }
-                const metadataListener=function(metadata){
+          }
+          const metadataListener=function(metadata){
                     logToConsole("forwarding the metadata:"+medata);
                     registerItem.socket.emit(receiver.session+"/metadata",metadata);
-                }
+          }
 
-                registerItem.socket.on(receiver.session+"/input",inputMessageListener);
-                receiver.socket.on(receiver.session+"/input",reverseInputMessageListener);
-                receiver.socket.on(receiver.session+"/metadata",metadataListener);
-                receiver.socket.on("disconnect", function(){
+          registerItem.socket.on(receiver.session+"/input",inputMessageListener);
+          receiver.socket.on(receiver.session+"/input",reverseInputMessageListener);
+          receiver.socket.on(receiver.session+"/metadata",metadataListener);
+          receiver.socket.on("disconnect", function(){
                       registerItem.socket.removeListener(receiver.session+"/input",inputMessageListener);
+                      inputPermissionMessage.allow=false;
+                      inputPermissionMessage.reason="received disconnected";
+                      registerItem.socket.emit(receiver.session+"/leave",JSON.stringify(inputPermissionMessage));
                       logToConsole("inputMessage messageListener is removed");
-                });
-                registerItem.socket.on("disconnect", function(){
+          });
+          registerItem.socket.on("disconnect", function(){
                       receiver.socket.removeListener(receiver.session+"/input",reverseInputMessageListener);
                       receiver.socket.removeListener(receiver.session+"/metadata",metadataListener);
                       receiver.socket.emit(receiver.session+"/leave",JSON.stringify(inputPermissionMessage));
                       logToConsole("reverse inputMessage messageListener is removed");
-                });
-                registerItem.socket.emit(receiver.session+"/inputPermissionResult",JSON.stringify(inputPermissionResult));
-          }
-          else{
-              logToConsole("inputPermissionResult message says it is not allowed");
-          }
-
+          });
+          this.sendSucessInputPermissionResult(registerItem,receiver,inputPermissionResult);
     },
-
+    sendSucessInputPermissionResult(registerItem,receiver,inputPermissionResult){
+        registerItem.socket.emit(receiver.session+"/inputPermissionResult",JSON.stringify(inputPermissionResult));
+    },
+    sendErrorInputPermissionResult(registerItem,inputPermissionMessage, reason){
+        inputPermissionMessage.allow=false;
+        inputPermissionMessage.reason=reason;
+        registerItem.socket.emit(inputPermissionMessage.connectSession+"/inputPermissionResult",JSON.stringify(inputPermissionMessage));
+        console.log("input Permisson is not allowed:"+reason);
+    }
 };
 module.exports=globalInputMessenger;
