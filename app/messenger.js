@@ -200,14 +200,14 @@ var globalInputMessenger={
                     logToConsole("forwarding the reverse input message:"+receiver.session+" message:"+inputMessage);
                     registerItem.socket.emit(receiver.session+"/input",inputMessage);
           }
-          const metadataListener=function(metadata){
-                    logToConsole("forwarding the metadata:"+medata);
-                    registerItem.socket.emit(receiver.session+"/metadata",metadata);
+          const outputMessageListener=function(outputMessage){
+                    logToConsole("forwarding the output message:"+outputMessage);
+                    registerItem.socket.emit(receiver.session+"/output",outputMessage);
           }
 
           registerItem.socket.on(receiver.session+"/input",inputMessageListener);
           receiver.socket.on(receiver.session+"/input",reverseInputMessageListener);
-          receiver.socket.on(receiver.session+"/metadata",metadataListener);
+          receiver.socket.on(receiver.session+"/output",outputMessageListener);
           receiver.socket.on("disconnect", function(){
                       registerItem.socket.removeListener(receiver.session+"/input",inputMessageListener);
                       inputPermissionMessage.allow=false;
@@ -217,7 +217,7 @@ var globalInputMessenger={
           });
           registerItem.socket.on("disconnect", function(){
                       receiver.socket.removeListener(receiver.session+"/input",reverseInputMessageListener);
-                      receiver.socket.removeListener(receiver.session+"/metadata",metadataListener);
+                      receiver.socket.removeListener(receiver.session+"/output",outputMessageListener);
                       receiver.socket.emit(receiver.session+"/leave",JSON.stringify(inputPermissionMessage));
                       logToConsole("reverse inputMessage messageListener is removed");
           });
