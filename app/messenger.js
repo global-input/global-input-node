@@ -79,7 +79,12 @@ var globalInputMessenger={
             logToConsole("the socket is diconnected:"+socket.id);
         });
         var that=this;
+        var disconnectTimeout=setTimeout(function(){
+          console.log("disconnected the socket because of the timeout");
+          socket.disconnect(true);
+        },7000);
         var onRegister=function(registerMessage){
+              clearTimeout(disconnectTimeout);
               logToConsole("register message is received:"+registerMessage);
               try{
                   that.onRegister(socket,JSON.parse(registerMessage));
@@ -116,7 +121,7 @@ var globalInputMessenger={
             const registerItem={
                 socket:socket,
                 apikey:request.apikey,
-                sessionGroup:request.sessionGroup,
+                securityGroup:request.securityGroup,
                 session:request.session,
                 client:request.client,
                 time:new Date()
@@ -165,8 +170,8 @@ var globalInputMessenger={
                 this.sendErrorInputPermissionResult(registerItem,inputPermissionMessage," there is no such receiver");
                 return;
             }
-            if(receiver.sessionGroup !== inputPermissionMessage.sessionGroup){
-              this.sendErrorInputPermissionResult(registerItem,inputPermissionMessage,"sessionGroup does not match");
+            if(receiver.securityGroup !== inputPermissionMessage.securityGroup){
+              this.sendErrorInputPermissionResult(registerItem,inputPermissionMessage,"securityGroup does not match");
               return;
             };
             var that=this;
