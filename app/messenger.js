@@ -20,6 +20,7 @@ var globalInputMessenger={
        else{
            this.ionamespace=io;
        }
+       console.log("Copyright © 2017-2022 by Dilshat Hewzulla");
        this.ionamespace.on("connect", this.onConnect.bind(this));
     },
     processArguments:function(argv){
