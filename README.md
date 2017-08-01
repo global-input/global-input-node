@@ -5,8 +5,8 @@ Global Input is the first commercial-grade, open-source software packages for en
 ## License
 
     /*
-     * Copyright 2017 Dr. Dilshat Hewzulla (hewzulla@gmail.com)
-     *
+     * Copyright 2017  Dr. Dilshat Hewzulla (hewzulla@gmail.com)
+     * Registration number:284715749
      * Licensed under the Apache License, Version 2.0 (the "License");
      * you may not use this file except in compliance with the License.
      * You may obtain a copy of the License at
