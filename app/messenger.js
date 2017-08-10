@@ -7,6 +7,13 @@ var logToConsole=function(message){
 var errorToConsole=function(message){
   console.error(new Date()+":"+message);
 }
+httpResponseHeader={
+          'Content-Type': "application/json",
+          'Access-Control-Allow-Origin': '*',
+          'Access-Control-Allow-Methods': 'GET',
+          'Access-Control-Allow-Headers': 'Content-Type,apikey',
+          'Access-Control-Max-Age': 86400
+    };
 var globalInputMessenger={
     registry:new Map(),
     configPath:"config/config.json",
@@ -55,6 +62,47 @@ var globalInputMessenger={
         logToConsole("------received test request----");
         res.sendFile(__dirname+"/index.html");
     },
+    requestSocketServer:function(req,res){
+        const { headers,params,query } = req;
+
+        var apikey = headers['apikey'];
+        if(!apikey){
+            apikey=query.apikey;
+        }
+        if(!apikey){
+          console.log("apikey is empty in url request");
+          this.sockerServerDenied(req,res, "apikey is empty");
+          return;
+        }
+        var application=this.getApplicationByApikey(apikey);
+        if(application){
+            console.log("granted:"+JSON.stringify(application));
+            this.socketServerGranted(req,res,application);
+        }
+        else{
+            console.log("defnied for "+qpikey);
+            this.sockerServerDenied(re,res, "apikey does not match");
+        }
+
+
+    },
+    socketServerGranted:function(req,res,application){
+      res.writeHead(200, httpResponseHeader);
+      var data={
+          result:"ok",
+          url:application.url
+      };
+      res.end(JSON.stringify(data));
+    },
+    sockerServerDenied:function(req,res, reason){
+        res.writeHead(401, httpResponseHeader);
+        var data={
+            result:"failed",
+            reason
+        };
+        res.end(JSON.stringify(data));
+    },
+
     logger:function(err, req, res, next){
         logToConsole(" GOT Request:::::::::!!!!");
         next(err)
@@ -65,12 +113,13 @@ var globalInputMessenger={
         console.error(error.stack);
       }
     },
-    isApiKeyValid:function(apikey){
-        if(this.config.apikeys.indexOf(apikey)>=0){
-          return true;
+    getApplicationByApikey:function(apikey){
+        var matched=this.config.applications.filter((app)=>app.apikey===apikey);
+        if(matched.length===0){
+          return null;
         }
         else{
-          return false;
+          return matched[0];
         }
     },
 
@@ -102,7 +151,8 @@ var globalInputMessenger={
         socket.emit("registerPermission", JSON.stringify(registerPermissionMessage));
     },
     onRegister:function(socket,request){
-            if(!this.isApiKeyValid(request.apikey)){
+      var matchedApplication=this.getApplicationByApikey(request.apikey);
+        if(!matchedApplication){
               try{
                       logToConsole("apikey is not valid:"+request.apikey)
                       var registeredMessage={
@@ -117,6 +167,9 @@ var globalInputMessenger={
                   logToConsole("error failed registered socket:"+error);
                 }
                 return false;
+            }
+            else{
+              console.log("client application connected:"+JSON.stringify(matchedApplication));
             }
             var that=this;
             const registerItem={
