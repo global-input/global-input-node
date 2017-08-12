@@ -170,12 +170,14 @@ var globalInputMessenger={
     onRegister:function(socket,request){
 
       var matchedApplication=this.getApplicationByApikey(request.apikey);
-        if(!matchedApplication){
-              winston.log('info',"apikey is not valid",{apikey:request.apikey}); 
+      if(!matchedApplication){
+              winston.log('info',"apikey is not valid",{apikey:request.apikey});
               this.sendFailedRegisterMessage(socket,request,"apikey is not valid");
                 return false;
-            }
-            if(matchedApplication.name!==this.config.node.name){
+      }
+      var matchedNode=this.config.node.accept.filter(m=>m===matchedApplication.name);
+
+            if(matchedNode.length===0){
                 this.sendFailedRegisterMessage(socket,request,"wrong node");
                 return false;
             }

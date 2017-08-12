@@ -5,7 +5,7 @@
    "logLevel":"info"
  },
  "node":{
-   "name":"local"
+   "accept":["local"]
  },
  "applications":[{
       "name":"local",
