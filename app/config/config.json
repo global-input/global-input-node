@@ -5,7 +5,7 @@
    "logLevel":"info"
  },
  "node":{
-   "url":"https://globalinput.co.uk"
+   "accept":["default", "demo"]
  },
  "applications":[{
     "name":"default",
