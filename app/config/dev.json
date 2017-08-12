@@ -1,0 +1,18 @@
+{
+ "port":1337,
+ "namespace":"",
+ "winston":{
+   "logLevel":"info"
+ },
+ "node":{
+   "name":"local"
+ },
+ "applications":[{
+      "name":"local",
+      "apikey":"AME6hDRWzGLfCfZbs",
+      "url":"http://192.168.0.5:1337"
+   }
+
+ ]
+
+}

@@ -1,6 +1,12 @@
 {
  "port":1337,
  "namespace":"",
+ "winston":{
+   "logLevel":"info"
+ },
+ "node":{
+   "url":"https://globalinput.co.uk"
+ },
  "applications":[{
     "name":"default",
     "apikey":"k7jc3QcMPKEXGW5UC",
@@ -9,10 +15,6 @@
       "name":"demo",
       "apikey":"AU2FsdGVkX1/DSe6",
       "url":"https://globalinput.co.uk"
-   },{
-      "name":"local",
-      "apikey":"AME6hDRWzGLfCfZbs",
-      "url":"http://192.168.0.5:1337"
    }
 
  ]

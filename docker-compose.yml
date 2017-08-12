@@ -2,11 +2,27 @@ version: '2'
 services:
 
   global_input_node:
-    build: .
+    build: global_input_node
     image: dilshat/global_input_node
     container_name: global_input_node
     ports:
       - "1337:1337"
+    volumes:
+      - ./app:/app      
+
+  nginx:
+    build: nginx
+    image: dilshat/wnginx
+    container_name: nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/data/websites/globalinput:/data/websites/globalinput
+      - ./var/log/nginx:/var/log/nginx
+
+    links:
+      - global_input_node
 networks:
    default:
      external:

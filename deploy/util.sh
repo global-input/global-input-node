@@ -16,6 +16,11 @@ executeScript(){
    ssh $deploy_to_username@$deploy_to_hostname 'bash -s' < $1
    echo "remote execution completed"
 }
+createDockerNetwork(){
+   echo "creating network on on  $deploy_to_username@$deploy_to_hostname "
+   ssh $deploy_to_username@$deploy_to_hostname "docker network create iterativesolution_default"
+
+}
 executeDeployedScriptOnServer(){
    echo "executing the deployed script $1 remotely  on  $deploy_to_username@$deploy_to_hostname "
    ssh $deploy_to_username@$deploy_to_hostname "cd $destzipfolder && ./$1"
@@ -36,9 +41,11 @@ uploadZipFile(){
     scp $sourcezipfilepath $deploy_to_username@$deploy_to_hostname:$destzipfolder/
 }
 
+
 uploadSSLCertificated(){
-    scp $ssl_certificate_location/* $deploy_to_username@$deploy_to_hostname:bdocker/bnginx/etc/nginx/ssl/
+    rsync -azvv ../global-input-secrets/$targetenv/letsencrypt/ $deploy_to_username@$deploy_to_hostname:$destzipfolder/nginx/etc/letsencrypt/
 }
+
 unzipZipFile(){
       createUniqueidforfilename
       unzipAndReplaceVariables $uniqueidforfilename
@@ -67,13 +74,20 @@ createSCriptFormakeSchellScriptExecutable(){
     uniqueidforfilename=$1
     echo "creating the script for making executable: /tmp/script_$uniqueidforfilename.sh"
     echo "cd  $destzipfolder && chmod u+x *.sh" > /tmp/script_$uniqueidforfilename.sh
+
+
 }
 
 createDeployScript(){
     echo "source $3" > deploy/deploy_to_$1.sh
     echo 'echo "deploying the version '$2' to '$5'@'$4' using the property file '$3' (for replacement of the environment specific variables) ..."' >>  deploy/deploy_to_$1.sh
-    echo "deploy/deploy.sh $4 $5 $2" >> deploy/deploy_to_$1.sh
+    echo "deploy/deploy.sh $4 $5 $2 $1" >> deploy/deploy_to_$1.sh
     chmod u+x deploy/deploy_to_$1.sh
+
+
+    echo "source $3" > deploy/create_network_$1.sh
+    echo "deploy/create_network.sh $4 $5 $2" >> deploy/create_network_$1.sh
+    chmod u+x deploy/create_network_$1.sh
 }
 
 
@@ -93,6 +107,8 @@ copyTheAppToDockerFolder(){
     echo "rsync -azvv  $destzipfolder/app/ $destzipfolder/node/app/" > /tmp/script_$uniqueidforfilename.sh
     executeScript /tmp/script_$uniqueidforfilename.sh
 }
+
+
 buildAndStartDocker(){
     executeDeployedScriptOnServer start.sh
 }
