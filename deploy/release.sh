@@ -7,6 +7,3 @@ mvn jgitflow:release-finish
 git checkout  master
 getProjectVersionFromPom
 git checkout develop
-
-deploy/create_deploy_scripts.sh
- 

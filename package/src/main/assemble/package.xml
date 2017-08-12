@@ -7,7 +7,7 @@
     <baseDirectory>maven</baseDirectory>
     <includeBaseDirectory>false</includeBaseDirectory>
     <fileSets>
-           
+
            <fileSet>
                    <directory>../app/</directory>
                    <includes>
@@ -16,20 +16,27 @@
                    <outputDirectory>/app</outputDirectory>
            </fileSet>
            <fileSet>
-                   <directory>../</directory>
+                   <directory>../nginx</directory>
                    <includes>
-                       <include>Dockerfile</include>
+                       <include>**/*</include>
                    </includes>
-                   <outputDirectory>/</outputDirectory>
+                   <outputDirectory>/nginx</outputDirectory>
            </fileSet>
+					 <fileSet>
+                   <directory>../global_input_node</directory>
+                   <includes>
+                       <include>**/*</include>
+                   </includes>
+                   <outputDirectory>/global_input_node</outputDirectory>
+           </fileSet>					 
            <fileSet>
                    <directory>../</directory>
                    <includes>
                        <include>*.sh</include>
-                       <include>*.yml</include>   
+                       <include>*.yml</include>
                    </includes>
                    <outputDirectory>/</outputDirectory>
            </fileSet>
-           
+
     </fileSets>
 </assembly>

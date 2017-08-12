@@ -1,9 +1,8 @@
 var fs = require('fs');
 const minimist     = require('minimist');
+const winston = require('winston')
 
-var logToConsole=function(message){
-      console.log(new Date()+":"+message);
-}
+
 var errorToConsole=function(message){
   console.error(new Date()+":"+message);
 }
@@ -32,14 +31,16 @@ var globalInputMessenger={
     },
     processArguments:function(argv){
         var  pathToConfigFile = minimist(argv).config;
+        console.log("********:"+pathToConfigFile);
         if(!pathToConfigFile){
             this.configPath="config/config.json";
-            logToConsole("using fallback config file path")
+
+
         }
         else{
             this.configPath=pathToConfigFile;
         }
-        logToConsole("pathToConfigFile:"+this.configPath);
+        winston.log('info',"using config file path",{configPath:this.configPath});
     },
 
     loadConfig:function(){
@@ -47,19 +48,20 @@ var globalInputMessenger={
         if(configPath && (!configPath.startsWith("/"))){
             configPath=__dirname+"/"+configPath;
         }
-        logToConsole("checking the config file:"+configPath);
+
 
         if(configPath && fs.existsSync(configPath)){
-            logToConsole("loading the configuration:"+configPath);
             this.config = JSON.parse(fs.readFileSync(configPath, 'utf8'));
+            winston.level=this.config.winston.logLevel;
         }
         else{
-            logToConsole("not exists:"+configPath);
+            winston.log('error',"config file does not exist",{configPath:configPath});
         }
+
     },
 
     loadIndexFile:function(req,res){
-        logToConsole("------received test request----");
+
         res.sendFile(__dirname+"/index.html");
     },
     requestSocketServer:function(req,res){
@@ -70,18 +72,18 @@ var globalInputMessenger={
             apikey=query.apikey;
         }
         if(!apikey){
-          console.log("apikey is empty in url request");
+          winston.log('info',"apikey is empty");
           this.sockerServerDenied(req,res, "apikey is empty");
           return;
         }
         var application=this.getApplicationByApikey(apikey);
         if(application){
-            console.log("granted:"+JSON.stringify(application));
+            winston.log('info',"granted socket url ",{application});
             this.socketServerGranted(req,res,application);
         }
         else{
-            console.log("defnied for "+qpikey);
-            this.sockerServerDenied(re,res, "apikey does not match");
+            winston.log('info',"denied socket url ",{apikey});
+            this.sockerServerDenied(req,res, "apikey does not match");
         }
 
 
@@ -104,14 +106,11 @@ var globalInputMessenger={
     },
 
     logger:function(err, req, res, next){
-        logToConsole(" GOT Request:::::::::!!!!");
+        winston.log('info',"request received");
         next(err)
     },
     processError:function(error,message){
-      errorToConsole(error+" "+message);
-      if(error&& error.stack){
-        console.error(error.stack);
-      }
+      winston.log('error',message,{error});
     },
     getApplicationByApikey:function(apikey){
         var matched=this.config.applications.filter((app)=>app.apikey===apikey);
@@ -124,18 +123,21 @@ var globalInputMessenger={
     },
 
     onConnect:function(socket){
-        logToConsole(" a socket connected:" +socket.id);
+        winston.log('info'," a socket connected",{id:socket.id});
+
+
         socket.on("disconnect", function(){
-            logToConsole("the socket is diconnected:"+socket.id);
+            winston.log('info'," a socket disconnected",{id:socket.id});
+
         });
         var that=this;
         var disconnectTimeout=setTimeout(function(){
-          console.log("disconnected the socket because of the timeout");
+          winston.log('info',"disconnected the socket because of the timeout",{id:socket.id});
           socket.disconnect(true);
         },7000);
         var onRegister=function(registerMessage){
               clearTimeout(disconnectTimeout);
-              logToConsole("register message is received:"+registerMessage);
+              winston.log('info',"register message is received");
               try{
                   that.onRegister(socket,JSON.parse(registerMessage));
               }
@@ -150,27 +152,39 @@ var globalInputMessenger={
         }
         socket.emit("registerPermission", JSON.stringify(registerPermissionMessage));
     },
+    sendFailedRegisterMessage:function(socket, request, errorMessage){
+      try{
+              winston.log('info',errorMessage);
+              var registeredMessage={
+                    result:"failed",
+                    reason:errorMessage
+              }
+              socket.emit("registered",JSON.stringify(registeredMessage));
+              socket.disconnect(true);
+
+          }
+        catch(error){
+          winston.log('error',"failed to send register-denied message",{error});
+        }
+    },
     onRegister:function(socket,request){
+
       var matchedApplication=this.getApplicationByApikey(request.apikey);
         if(!matchedApplication){
-              try{
-                      logToConsole("apikey is not valid:"+request.apikey)
-                      var registeredMessage={
-                            result:"failed",
-                            reason:"denied"
-                      }
-                      socket.emit("registered",JSON.stringify(registeredMessage));
-                      socket.disconnect(true);
-
-                  }
-                catch(error){
-                  logToConsole("error failed registered socket:"+error);
-                }
+              winston.log('info',"apikey is not valid",{apikey:request.apikey}); 
+              this.sendFailedRegisterMessage(socket,request,"apikey is not valid");
+                return false;
+            }
+            if(matchedApplication.name!==this.config.node.name){
+                this.sendFailedRegisterMessage(socket,request,"wrong node");
                 return false;
             }
             else{
-              console.log("client application connected:"+JSON.stringify(matchedApplication));
+              winston.log('info',"client application connected",{matchedApplication});
             }
+
+
+
             var that=this;
             const registerItem={
                 socket:socket,
@@ -183,12 +197,16 @@ var globalInputMessenger={
             this.registry.set(registerItem.session,registerItem);
             socket.on("disconnect", function(){
                   that.registry.delete(registerItem.session);
-                  logToConsole("removed the register:"+registerItem.session+":"+that.registry.size);
+                  winston.log('info',"removed from the registry",{session:registerItem.session,size:that.registry.size});
+
+
             });
-            logToConsole("registered:"+registerItem.session+":"+this.registry.size);
+            winston.log('info',"registered",{session:registerItem.session,size:this.registry.size});
+
+
             socket.on("inputPermision", function(data){
-              logToConsole("inputPermision Message is received:"+data);
-               try{
+              winston.log('info',"inputPermision Message is received");
+              try{
                     that.onInputPermission(registerItem,JSON.parse(data));
                   }
                   catch(error){
@@ -204,23 +222,26 @@ var globalInputMessenger={
     onInputPermission:function(registerItem, inputPermissionMessage){
 
             if(registerItem.client!==inputPermissionMessage.client){
-                  logToConsole("wrong client vaue:"+registerItem.client+":"+inputPermissionMessage.client);
+                  winston.log('info',"wrong client value",{inputPermissionMessag});
                   this.sendErrorInputPermissionResult(registerItem,inputPermissionMessage,"Wrong client value");
                   return;
             }
             if(registerItem.session!==inputPermissionMessage.session){
-                  logToConsole("wrong session vaue");
+
+                      winston.log('info',"wrong session value",{inputPermissionMessage});
                   this.sendErrorInputPermissionResult(registerItem,inputPermissionMessage,"Wrong session value");
                   return;
             }
             if(!inputPermissionMessage.connectSession){
-              logToConsole("input permission message missing connectSession");
+              winston.log('info',"input permission message missing connectSession");
+
+
               this.sendErrorInputPermissionResult(registerItem,inputPermissionMessage,"Missing connectSession value");
               return;
             }
             const receiver=this.registry.get(inputPermissionMessage.connectSession);
             if(receiver==null){
-                logToConsole("there is not such receiver:"+inputPermissionMessage.connectSession);
+                winston.log('info',"there is not such receiver",{inputPermissionMessage});
                 this.sendErrorInputPermissionResult(registerItem,inputPermissionMessage," there is no such receiver");
                 return;
             }
@@ -230,7 +251,9 @@ var globalInputMessenger={
             };
             var that=this;
             var onInputPermissionResult=function(data){
-              logToConsole("inputPermissionResult is received:"+data);
+              winston.log('info',"inputPermissionResult is received");
+
+
                try{
                     that.onInputPermissionResult(registerItem,inputPermissionMessage,receiver,JSON.parse(data));
                   }
@@ -241,7 +264,7 @@ var globalInputMessenger={
                   receiver.socket.removeListener(receiver.session+"/inputPermissionResult",onInputPermissionResult);
             };
             receiver.socket.on(receiver.session+"/inputPermissionResult", onInputPermissionResult);
-            logToConsole("sending inputPermission message to:"+receiver.session+":"+receiver.client);
+            winston.log('info',"sending inputPermission message");
             receiver.socket.emit(receiver.session+"/inputPermission",JSON.stringify(inputPermissionMessage));
     },
 
@@ -252,15 +275,17 @@ var globalInputMessenger={
             return;
           }
           const inputMessageListener=function(inputMessage){
-                  logToConsole("forwarding the input message:"+receiver.session+" message:"+inputMessage);
+                    winston.log('info',"forwarding the input message");
                     receiver.socket.emit(receiver.session+"/input",inputMessage);
           };
           const reverseInputMessageListener=function(inputMessage){
-                    logToConsole("forwarding the reverse input message:"+receiver.session+" message:"+inputMessage);
+                    winston.log('info',"forwarding the reverse input message");
+
                     registerItem.socket.emit(receiver.session+"/input",inputMessage);
           }
           const outputMessageListener=function(outputMessage){
-                    logToConsole("forwarding the output message:"+outputMessage);
+                    winston.log('info',"forwarding the output message");
+
                     registerItem.socket.emit(receiver.session+"/output",outputMessage);
           }
 
@@ -272,13 +297,16 @@ var globalInputMessenger={
                       inputPermissionMessage.allow=false;
                       inputPermissionMessage.reason="received disconnected";
                       registerItem.socket.emit(receiver.session+"/leave",JSON.stringify(inputPermissionMessage));
-                      logToConsole("inputMessage messageListener is removed");
+                      winston.log('info',"inputMessage messageListener is removed");
+
           });
           registerItem.socket.on("disconnect", function(){
                       receiver.socket.removeListener(receiver.session+"/input",reverseInputMessageListener);
                       receiver.socket.removeListener(receiver.session+"/output",outputMessageListener);
                       receiver.socket.emit(receiver.session+"/leave",JSON.stringify(inputPermissionMessage));
-                      logToConsole("reverse inputMessage messageListener is removed");
+                      winston.log('info',"reverse inputMessage messageListener is removed");
+
+
           });
           this.sendSucessInputPermissionResult(registerItem,receiver,inputPermissionResult);
     },
