@@ -243,8 +243,8 @@ var globalInputMessenger={
             }
             const receiver=this.registry.get(inputPermissionMessage.connectSession);
             if(receiver==null){
-                winston.log('info',"there is not such receiver",{inputPermissionMessage});
-                this.sendErrorInputPermissionResult(registerItem,inputPermissionMessage," there is no such receiver");
+                winston.log('info',"The session does not exist",{inputPermissionMessage});
+                this.sendErrorInputPermissionResult(registerItem,inputPermissionMessage,"The session does not exist");
                 return;
             }
             if(receiver.securityGroup !== inputPermissionMessage.securityGroup){

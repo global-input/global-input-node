@@ -15,6 +15,13 @@
                    </includes>
                    <outputDirectory>/app</outputDirectory>
            </fileSet>
+					 <fileSet>
+                   <directory>../app/</directory>
+                   <includes>
+                       <include>**/*</include>
+                   </includes>
+                   <outputDirectory>global_input_node/app</outputDirectory>
+           </fileSet>
            <fileSet>
                    <directory>../nginx</directory>
                    <includes>
@@ -28,7 +35,7 @@
                        <include>**/*</include>
                    </includes>
                    <outputDirectory>/global_input_node</outputDirectory>
-           </fileSet>					 
+           </fileSet>
            <fileSet>
                    <directory>../</directory>
                    <includes>

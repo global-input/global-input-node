@@ -31,5 +31,3 @@ ENTRYPOINT ["node", "/app/server.js"]
 #
 # This assumes that a configuration file has been mounted.
 CMD ["--config", "/app/config/config.json"]
-
-
