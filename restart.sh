@@ -1,0 +1,2 @@
+docker stop global_input_node
+docker start global_input_node

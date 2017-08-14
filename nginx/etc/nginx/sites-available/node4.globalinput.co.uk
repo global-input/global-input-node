@@ -15,51 +15,37 @@
 #
 server {
 	listen 80;
-        server_name globalinput.co.uk www.globalinput.co.uk;
-
-	 access_log  /var/log/nginx/access.log;
-     error_log  /var/log/nginx/error.log;
-     root /data/websites/globalinput;
-     index index.php index.html index.htm;
-
-     include /etc/nginx/esb/*_path.conf;
-
-		location /global-input-app-example/ {
-			 return 302 $scheme://$host/;
-		}
-
-
-    listen 443 ssl; # managed by Certbot
-
-   ssl_certificate /etc/letsencrypt/live/globalinput.co.uk/fullchain.pem; # managed by Certbot
-   ssl_certificate_key /etc/letsencrypt/live/globalinput.co.uk/privkey.pem; # managed by Certbot
-    include /etc/letsencrypt/options-ssl-nginx.conf; # managed by Certbot
-
-
-
-    # Redirect non-https traffic to https
-    # if ($scheme != "https") {
-    #     return 301 https://$host$request_uri;
-    # } # managed by Certbot
-
-}
-
-server {
-	listen 80;
-        server_name node4.globalinput.co.uk node5.globalinput.co.uk node6.globalinput.co.uk node7.globalinput.co.uk
+        server_name node4.globalinput.co.uk node5.globalinput.co.uk node6.globalinput.co.uk node7.globalinput.co.uk;
 
 	   access_log  /var/log/nginx/access.log;
      error_log  /var/log/nginx/error.log;
      root /data/websites/globalinput;
      index index.php index.html index.htm;
 
-    include /etc/nginx/esb/*_path.conf;
 
 		location /global-input-app-example/ {
 			 return 302 $scheme://$host/;
 		}
     listen 443 ssl; # managed by Certbot
-    ssl_certificate /etc/node4567/live/node4.globalinput.co.uk/fullchain.pem; # managed by Certbot
-    ssl_certificate_key /etc/node4567/live/node4.globalinput.co.uk/privkey.pem; # managed by Certbot
-    include /etc/node4567/options-ssl-nginx.conf; # managed by Certbot
+    ssl_certificate /etc/letsencrypt/live/node4.globalinput.co.uk/fullchain.pem; # managed by Certbot
+    ssl_certificate_key /etc/letsencrypt/live/node4.globalinput.co.uk/privkey.pem; # managed by Certbot
+    include /etc/letsencrypt/options-ssl-nginx.conf; # managed by Certbot
+}
+server {
+	listen 80;
+        server_name node4.globalinput.co.uk node5.globalinput.co.uk node6.globalinput.co.uk node7.globalinput.co.uk 
+
+	   access_log  /var/log/nginx/access.log;
+     error_log  /var/log/nginx/error.log;
+     root /data/websites/globalinput;
+     index index.php index.html index.htm;
+
+
+		location /global-input-app-example/ {
+			 return 302 $scheme://$host/;
+		}
+    listen 443 ssl; # managed by Certbot
+    ssl_certificate /etc/letsencrypt/live/node4.globalinput.co.uk/fullchain.pem; # managed by Certbot
+    ssl_certificate_key /etc/letsencrypt/live/node4.globalinput.co.uk/privkey.pem; # managed by Certbot
+    include /etc/letsencrypt/options-ssl-nginx.conf; # managed by Certbot
 }

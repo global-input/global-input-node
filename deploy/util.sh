@@ -44,6 +44,7 @@ uploadZipFile(){
 
 uploadSSLCertificated(){
     rsync -azvv ../global-input-secrets/$targetenv/letsencrypt/ $deploy_to_username@$deploy_to_hostname:$destzipfolder/nginx/etc/letsencrypt/
+    rsync -azvv ../global-input-secrets/$targetenv/node4567/letsencrypt/ $deploy_to_username@$deploy_to_hostname:$destzipfolder/nginx/etc/node4567/
 }
 
 unzipZipFile(){
@@ -88,6 +89,11 @@ createDeployScript(){
     echo "source $3" > deploy/create_network_$1.sh
     echo "deploy/create_network.sh $4 $5 $2" >> deploy/create_network_$1.sh
     chmod u+x deploy/create_network_$1.sh
+
+
+    echo "source $3" > deploy/update_$1.sh
+    echo "deploy/update.sh $4 $5 $2" >> deploy/update_$1.sh
+    chmod u+x deploy/update_$1.sh
 }
 
 
@@ -111,4 +117,7 @@ copyTheAppToDockerFolder(){
 
 buildAndStartDocker(){
     executeDeployedScriptOnServer start.sh
+}
+restartDocker(){
+    executeDeployedScriptOnServer restart.sh
 }

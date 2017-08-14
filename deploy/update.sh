@@ -9,5 +9,6 @@ createFolders
 uploadZipFile
 unzipZipFile
 makeSchellScriptExecutable
-uploadSSLCertificated
-buildAndStartDocker
+
+
+restartDocker
