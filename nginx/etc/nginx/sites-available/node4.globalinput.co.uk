@@ -33,7 +33,7 @@ server {
 }
 server {
 	listen 80;
-        server_name node4.globalinput.co.uk node5.globalinput.co.uk node6.globalinput.co.uk node7.globalinput.co.uk 
+        server_name node4.globalinput.co.uk node5.globalinput.co.uk node6.globalinput.co.uk node7.globalinput.co.uk
 
 	   access_log  /var/log/nginx/access.log;
      error_log  /var/log/nginx/error.log;
