@@ -248,7 +248,7 @@ var globalInputMessenger={
                 return;
             }
             if(receiver.securityGroup !== inputPermissionMessage.securityGroup){
-              this.sendErrorInputPermissionResult(registerItem,inputPermissionMessage,"securityGroup does not match");
+              this.sendErrorInputPermissionResult(registerItem,inputPermissionMessage,"The app needs pairing with the service application, contact with the service application provider.");
               return;
             };
             var that=this;
