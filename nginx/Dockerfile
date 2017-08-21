@@ -19,7 +19,10 @@ ADD data/websites/globalinput /data/websites/globalinput
 
 ADD etc/nginx/esb /etc/nginx/esb
 
+# forward request and error logs to docker log collector
+RUN ln -sf /dev/stdout /var/log/nginx/access.log \
+	&& ln -sf /dev/stderr /var/log/nginx/error.log
 
 EXPOSE 80 443
 
-CMD service nginx start
+CMD ["nginx", "-g", "daemon off;"]
