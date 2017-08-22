@@ -207,11 +207,11 @@ var globalInputMessenger={
 
 
             socket.on("inputPermision", function(data){
-              winston.log('info',"inputPermision Message is received");
               try{
                     that.onInputPermission(registerItem,JSON.parse(data));
                   }
                   catch(error){
+                    winston.log('error',"error processing the inputPermision message"+error);
                     that.processError(error," in requestJoin");
                   }
                   socket.removeAllListeners("inputPermision");
@@ -248,9 +248,12 @@ var globalInputMessenger={
                 return;
             }
             if(receiver.securityGroup !== inputPermissionMessage.securityGroup){
+              winston.log('info',"The  app needs paring",{inputPermissionMessage});
               this.sendErrorInputPermissionResult(registerItem,inputPermissionMessage,"The app needs pairing with the service application, contact with the service application provider.");
               return;
             };
+            winston.log('info',"the input Permission received from:",{client:inputPermissionMessage.client});
+
             var that=this;
             var onInputPermissionResult=function(data){
               winston.log('info',"inputPermissionResult is received");
