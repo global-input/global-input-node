@@ -10,6 +10,16 @@ services:
     volumes:
       - ./app:/app
 
+  qr_code_node:
+     build: qr_code_node
+     image: dilshat/qr_code_node
+     container_name: qr_code_node
+     ports:
+        - "1338:1338"
+     volumes:
+        - ./qr-code-app:/app
+
+
   nginx:
     build: nginx
     image: dilshat/wnginx
@@ -19,10 +29,9 @@ services:
       - "443:443"
     volumes:
       - ./nginx/data/websites/globalinput:/data/websites/globalinput
-
-
     links:
       - global_input_node
+      - qr_code_node
 networks:
    default:
      external:

@@ -30,9 +30,8 @@ server {
 
 
     listen 443 ssl; # managed by Certbot
-
-   ssl_certificate /etc/letsencrypt/live/globalinput.co.uk/fullchain.pem; # managed by Certbot
-   ssl_certificate_key /etc/letsencrypt/live/globalinput.co.uk/privkey.pem; # managed by Certbot
+ssl_certificate /etc/letsencrypt/live/globalinput.co.uk/fullchain.pem; # managed by Certbot
+ssl_certificate_key /etc/letsencrypt/live/globalinput.co.uk/privkey.pem; # managed by Certbot
     include /etc/letsencrypt/options-ssl-nginx.conf; # managed by Certbot
 
 
@@ -41,6 +40,10 @@ server {
     # if ($scheme != "https") {
     #     return 301 https://$host$request_uri;
     # } # managed by Certbot
+
+
+
+
 
 }
 
@@ -59,7 +62,15 @@ server {
 			 return 302 $scheme://$host/;
 		}
     listen 443 ssl; # managed by Certbot
-    ssl_certificate /etc/node4567/live/node4.globalinput.co.uk/fullchain.pem; # managed by Certbot
-    ssl_certificate_key /etc/node4567/live/node4.globalinput.co.uk/privkey.pem; # managed by Certbot
+ssl_certificate /etc/letsencrypt/live/globalinput.co.uk/fullchain.pem; # managed by Certbot
+ssl_certificate_key /etc/letsencrypt/live/globalinput.co.uk/privkey.pem; # managed by Certbot
     include /etc/node4567/options-ssl-nginx.conf; # managed by Certbot
+
+
+
+
+
+
+
+
 }

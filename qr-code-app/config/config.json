@@ -1,0 +1,7 @@
+{
+ "port":1338,
+ "winston":{
+   "logLevel":"info"
+ }
+
+}

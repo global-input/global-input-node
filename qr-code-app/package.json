@@ -1,0 +1,28 @@
+{
+  "name": "global-input-node",
+  "version": "1.0.0",
+  "description": "Global Input Node Server",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/global-input/global-input-node.git"
+  },
+  "author": "Dilshat Hewzulla",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/global-input/global-input-node/issues"
+  },
+  "homepage": "https://github.com/global-input/global-input-node#readme",
+  "dependencies": {
+    "body-parser": "^1.17.2",
+    "express": "^4.15.3",
+    "http": "0.0.0",
+    "minimist": "^1.2.0",
+    "qrcode": "^0.9.0",
+    "querystring": "^0.2.0",
+    "winston": "^2.3.1"
+  }
+}
