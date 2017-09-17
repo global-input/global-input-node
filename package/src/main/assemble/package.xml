@@ -22,6 +22,24 @@
                    </includes>
                    <outputDirectory>global_input_node/app</outputDirectory>
            </fileSet>
+
+
+					 <fileSet>
+                   <directory>../qr-code-app/</directory>
+                   <includes>
+                       <include>**/*</include>
+                   </includes>
+                   <outputDirectory>/qr-code-app</outputDirectory>
+           </fileSet>
+					 <fileSet>
+                   <directory>../qr-code-app/</directory>
+                   <includes>
+                       <include>**/*</include>
+                   </includes>
+                   <outputDirectory>qr_code_node/qr-code-app</outputDirectory>
+           </fileSet>
+
+
            <fileSet>
                    <directory>../nginx</directory>
                    <includes>
@@ -36,6 +54,14 @@
                    </includes>
                    <outputDirectory>/global_input_node</outputDirectory>
            </fileSet>
+					 <fileSet>
+                   <directory>../qr_code_node</directory>
+                   <includes>
+                       <include>**/*</include>
+                   </includes>
+                   <outputDirectory>/qr_code_node</outputDirectory>
+           </fileSet>
+
            <fileSet>
                    <directory>../</directory>
                    <includes>

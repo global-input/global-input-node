@@ -1,5 +1,5 @@
 sudo apt-get install apt-transport-https ca-certificates
-
+sudo apt-get install curl
 curl -fsSL https://yum.dockerproject.org/gpg | sudo apt-key add -
 
 sudo apt-get install software-properties-common
@@ -27,8 +27,3 @@ sudo apt-get install python-setuptools
 sudo apt-get install python3-setuptools
 
 sudo pip install docker-compose
-
-
-
-
-
