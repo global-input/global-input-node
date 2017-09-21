@@ -1,21 +1,13 @@
-# Global Input Software
-Global Input is the first commercial-grade, open-source software packages for enabling applications running on multiple devices to exchange information securely.
+# global-input-node
 
+This is the websocket server used by the Global Input Software. If you would like to host your own Global Input websocket server, you need to download and run this NodeJS code.
 
-## License
+Please visit following for more information:
 
-    /*
-     * Copyright 2017  Dr. Dilshat Hewzulla (hewzulla@gmail.com)
-     * Registration number:284715749
-     * Licensed under the Apache License, Version 2.0 (the "License");
-     * you may not use this file except in compliance with the License.
-     * You may obtain a copy of the License at
-     *
-     *      http://www.apache.org/licenses/LICENSE-2.0
-     *
-     * Unless required by applicable law or agreed to in writing, software
-     * distributed under the License is distributed on an "AS IS" BASIS,
-     * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-     * See the License for the specific language governing permissions and
-     * limitations under the License.
-     */
+> [https://globalinput.co.uk](https://globalinput.co.uk)
+
+It include the code for building the dockers to bundle the nGinx load balancer with the NodeJS application.
+
+If you would like to pull and run  the NodeJS application from the docker hub:
+
+> ```docker run -t dilshat/global_input_node  --name global_input_node -p 1337:1337 ```
