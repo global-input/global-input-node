@@ -43,7 +43,9 @@ uploadZipFile(){
 
 
 uploadSSLCertificated(){
+    echo "executing:rsync -azvv ../global-input-secrets/$targetenv/letsencrypt/ $deploy_to_username@$deploy_to_hostname:$destzipfolder/nginx/etc/letsencrypt/"
     rsync -azvv ../global-input-secrets/$targetenv/letsencrypt/ $deploy_to_username@$deploy_to_hostname:$destzipfolder/nginx/etc/letsencrypt/
+    echo "rsync -azvv ../global-input-secrets/$targetenv/letsencrypt/ $deploy_to_username@$deploy_to_hostname:$destzipfolder/nginx/etc/letsencrypt/"
     rsync -azvv ../global-input-secrets/$targetenv/node4567/letsencrypt/ $deploy_to_username@$deploy_to_hostname:$destzipfolder/nginx/etc/node4567/
 }
 
