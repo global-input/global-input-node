@@ -24,7 +24,7 @@ server {
 
      include /etc/nginx/esb/*_path.conf;
 
-		location /global-input-app-example/ {
+		location /global-input-app/ {
 			 return 302 $scheme://$host/;
 		}
 
@@ -58,19 +58,16 @@ server {
 
     include /etc/nginx/esb/*_path.conf;
 
-		location /global-input-app-example/ {
+		location /global-input-app/ {
 			 return 302 $scheme://$host/;
 		}
+		location / {
+      try_files $uri $uri/ /index.html;
+    }
     listen 443 ssl; # managed by Certbot
 ssl_certificate /etc/letsencrypt/live/globalinput.co.uk/fullchain.pem; # managed by Certbot
 ssl_certificate_key /etc/letsencrypt/live/globalinput.co.uk/privkey.pem; # managed by Certbot
     include /etc/node4567/options-ssl-nginx.conf; # managed by Certbot
-
-
-
-
-
-
 
 
 }

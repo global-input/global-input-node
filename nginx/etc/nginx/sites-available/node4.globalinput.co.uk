@@ -23,7 +23,7 @@ server {
      index index.php index.html index.htm;
 
 
-		location /global-input-app-example/ {
+		location /global-input-app/ {
 			 return 302 $scheme://$host/;
 		}
     listen 443 ssl; # managed by Certbot
