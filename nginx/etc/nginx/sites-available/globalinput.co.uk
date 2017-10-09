@@ -24,9 +24,9 @@ server {
 
      include /etc/nginx/esb/*_path.conf;
 
-		location /global-input-app/ {
-			 return 302 $scheme://$host/;
-		}
+		  location /global-input-app {
+   			try_files $uri /index.html;
+ 			}
 
 
     listen 443 ssl; # managed by Certbot
