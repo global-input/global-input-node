@@ -16,7 +16,6 @@ globalInputMessenger.init(io,process.argv.slice(2));
 
 app.use(globalInputMessenger.logger.bind(globalInputMessenger));
 
-
 app.get("/global-input/request-socket-url", globalInputMessenger.requestSocketServer.bind(globalInputMessenger));
 
 //app.get("/",globalInputMessenger.loadIndexFile);
