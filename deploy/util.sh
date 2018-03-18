@@ -33,6 +33,7 @@ createFolders(){
     echo "creating the script for creating folder: /tmp/script_$uniqueidforfilename.sh"
     echo "mkdir -p $destzipfolder" > /tmp/script_$uniqueidforfilename.sh
     echo "mkdir -p $destzipfolder/node/app" > /tmp/script_$uniqueidforfilename.sh
+    echo "mkdir -p $destzipfolder/nginx/etc/nginx/ssl" > /tmp/script_$uniqueidforfilename.sh
     executeScript /tmp/script_$uniqueidforfilename.sh
 }
 
@@ -47,6 +48,16 @@ uploadSSLCertificated(){
     rsync -azvv ../global-input-secrets/$targetenv/letsencrypt/ $deploy_to_username@$deploy_to_hostname:$destzipfolder/nginx/etc/letsencrypt/
     echo "rsync -azvv ../global-input-secrets/$targetenv/letsencrypt/ $deploy_to_username@$deploy_to_hostname:$destzipfolder/nginx/etc/letsencrypt/"
     rsync -azvv ../global-input-secrets/$targetenv/node4567/letsencrypt/ $deploy_to_username@$deploy_to_hostname:$destzipfolder/nginx/etc/node4567/
+
+    scp ../global-input-secrets/$targetenv/godaddy/* $deploy_to_username@$deploy_to_hostname:$destzipfolder/nginx/etc/nginx/ssl/
+    scp ../global-input-secrets/$targetenv/csr/globalinput.co.uk.key $deploy_to_username@$deploy_to_hostname:$destzipfolder/nginx/etc/nginx/ssl/globalinput.co.uk.key
+
+    createUniqueidforfilename
+    echo "creating crt file"
+    echo "cat $destzipfolder/nginx/etc/nginx/ssl/397143f89bd4800b.crt > $destzipfolder/nginx/etc/nginx/ssl/globalinput.co.uk.crt" > /tmp/script_$uniqueidforfilename.sh
+    echo "cat $destzipfolder/nginx/etc/nginx/ssl/gd_bundle-g2-g1.crt >> $destzipfolder/nginx/etc/nginx/ssl/globalinput.co.uk.crt" >> /tmp/script_$uniqueidforfilename.sh
+    executeScript /tmp/script_$uniqueidforfilename.sh
+
 }
 
 unzipZipFile(){

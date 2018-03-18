@@ -7,6 +7,7 @@ RUN apt-get update  && apt-get install -y curl git nginx
 RUN rm -v /etc/nginx/nginx.conf
 ADD etc/nginx/nginx.conf /etc/nginx/
 ADD etc/nginx/sites-available /etc/nginx/sites-available
+ADD etc/nginx/ssl /etc/nginx/ssl
 ADD etc/letsencrypt /etc/letsencrypt
 ADD etc/node4567 /etc/node4567
 RUN rm -rf /var/www/html/index.nginx-debian.html
