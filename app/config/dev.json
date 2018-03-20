@@ -5,12 +5,16 @@
    "logLevel":"info"
  },
  "node":{
-   "accept":["local"]
+   "accept":["default", "demo"]
  },
  "applications":[{
-      "name":"local",
-      "apikey":"AME6hDRWzGLfCfZbs",
-      "url":"http://192.168.0.5:1337"
+    "name":"default",
+    "apikey":"k7jc3QcMPKEXGW5UC",
+    "url":"http://192.168.0.6:1337"
+   },{
+      "name":"demo",
+      "apikey":"AU2FsdGVkX1/DSe6",
+      "url":"http://192.168.0.6:1337"
    }
 
  ]

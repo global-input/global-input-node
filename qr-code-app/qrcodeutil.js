@@ -1,6 +1,13 @@
 var fs = require('fs');
 const minimist     = require('minimist');
 const winston = require('winston')
+
+var logger = new (winston.Logger)({
+    transports: [
+      new (winston.transports.Console)({'timestamp':true})
+    ]
+});
+
 var QRCode = require('qrcode');
 
 var errorToConsole=function(message){
@@ -30,7 +37,7 @@ var qrcodeutil={
         else{
             this.configPath=pathToConfigFile;
         }
-        winston.log('info',"using config file path",{configPath:this.configPath});
+        logger.log('info',"using config file path",{configPath:this.configPath});
     },
 
     loadConfig:function(){
@@ -45,7 +52,7 @@ var qrcodeutil={
             winston.level=this.config.winston.logLevel;
         }
         else{
-            winston.log('error',"config file does not exist",{configPath:configPath});
+            logger.log('error',"config file does not exist",{configPath:configPath});
         }
 
     },
@@ -55,7 +62,7 @@ var qrcodeutil={
     qrcodeimage:function(request,response){
       var level = request.params.level;
       var content=request.params.content;
-      response.setHeader('Content-type','image/png');      
+      response.setHeader('Content-type','image/png');
       QRCode.toFileStream(response,content,{errorCorrectionLevel:level});
     }
 };
