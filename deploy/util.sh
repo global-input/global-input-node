@@ -51,7 +51,7 @@ uploadSSLCertificated(){
 
     scp ../global-input-secrets/$targetenv/godaddy/* $deploy_to_username@$deploy_to_hostname:$destzipfolder/nginx/etc/nginx/ssl/
     scp ../global-input-secrets/$targetenv/csr/globalinput.co.uk.key $deploy_to_username@$deploy_to_hostname:$destzipfolder/nginx/etc/nginx/ssl/globalinput.co.uk.key
-
+    scp ../global-input-secrets/$targetenv/dhparam.pem $deploy_to_username@$deploy_to_hostname:$destzipfolder/nginx/etc/nginx/ssl/
     createUniqueidforfilename
     echo "creating crt file"
     echo "cat $destzipfolder/nginx/etc/nginx/ssl/397143f89bd4800b.crt > $destzipfolder/nginx/etc/nginx/ssl/globalinput.co.uk.crt" > /tmp/script_$uniqueidforfilename.sh
