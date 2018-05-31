@@ -10,11 +10,11 @@
  "applications":[{
     "name":"default",
     "apikey":"k7jc3QcMPKEXGW5UC",
-    "url":"http://192.168.0.6:1337"
+    "url":"http://127.0.0.1:1337"
    },{
       "name":"demo",
-      "apikey":"AU2FsdGVkX1/DSe6",
-      "url":"http://192.168.0.6:1337"
+      "apikey":"1AU2FsdGVkX1/DSe6",
+      "url":"http://127.0.0.1:1337"
    }
 
  ]
