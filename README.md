@@ -83,4 +83,4 @@ This repository also includes the Docker configurations for building the necessa
 
 [```start.sh```](https://github.com/global-input/global-input-node/blob/master/start.sh) script that run the docket-compose to build and start up all the docker containers.
 
-[```nginx/etc/nginx/sites-available/sites-available/globalinput.co.uk```](https://github.com/global-input/global-input-node/blob/master/nginx/etc/nginx/sites-available/globalinput.co.uk): You need to modify this nGinx configuration file before building the Nginx container. You need to modify the value of the  ```_server_name```
+[```nginx/etc/nginx/sites-available/sites-available/globalinput.co.uk```](https://github.com/global-input/global-input-node/blob/master/nginx/etc/nginx/sites-available/globalinput.co.uk): The nGinx configuration file. You need to modify the fule building the Nginx container: modify the value of the  ```_server_name``` parameter to the domain name of your server. Modify the SSL section to use your server's SSL certificates.
