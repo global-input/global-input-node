@@ -1,4 +1,6 @@
 source deploy/util.sh
 mvn package
 getProjectVersionFromPom
-deploy/create_deploy_scripts.sh
+
+echo $projectversion >/tmp/global_input_node_deploy_version.txt
+displayDeploymentHelp packaging

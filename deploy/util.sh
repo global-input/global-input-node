@@ -43,22 +43,7 @@ uploadZipFile(){
 }
 
 
-uploadSSLCertificated(){
-    echo "executing:rsync -azvv ../global-input-secrets/$targetenv/letsencrypt/ $deploy_to_username@$deploy_to_hostname:$destzipfolder/nginx/etc/letsencrypt/"
-    rsync -azvv ../global-input-secrets/$targetenv/letsencrypt/ $deploy_to_username@$deploy_to_hostname:$destzipfolder/nginx/etc/letsencrypt/
-    echo "rsync -azvv ../global-input-secrets/$targetenv/letsencrypt/ $deploy_to_username@$deploy_to_hostname:$destzipfolder/nginx/etc/letsencrypt/"
-    rsync -azvv ../global-input-secrets/$targetenv/node4567/letsencrypt/ $deploy_to_username@$deploy_to_hostname:$destzipfolder/nginx/etc/node4567/
 
-    scp ../global-input-secrets/$targetenv/godaddy/* $deploy_to_username@$deploy_to_hostname:$destzipfolder/nginx/etc/nginx/ssl/
-    scp ../global-input-secrets/$targetenv/csr/globalinput.co.uk.key $deploy_to_username@$deploy_to_hostname:$destzipfolder/nginx/etc/nginx/ssl/globalinput.co.uk.key
-    scp ../global-input-secrets/$targetenv/dhparam.pem $deploy_to_username@$deploy_to_hostname:$destzipfolder/nginx/etc/nginx/ssl/
-    createUniqueidforfilename
-    echo "creating crt file"
-    echo "cat $destzipfolder/nginx/etc/nginx/ssl/397143f89bd4800b.crt > $destzipfolder/nginx/etc/nginx/ssl/globalinput.co.uk.crt" > /tmp/script_$uniqueidforfilename.sh
-    echo "cat $destzipfolder/nginx/etc/nginx/ssl/gd_bundle-g2-g1.crt >> $destzipfolder/nginx/etc/nginx/ssl/globalinput.co.uk.crt" >> /tmp/script_$uniqueidforfilename.sh
-    executeScript /tmp/script_$uniqueidforfilename.sh
-
-}
 
 unzipZipFile(){
       createUniqueidforfilename
@@ -133,4 +118,29 @@ buildAndStartDocker(){
 }
 restartDocker(){
     executeDeployedScriptOnServer restart.sh
+}
+displayDeploymentHelp(){
+  echo
+  echo
+  echo "********* Completed $1 *********"
+  echo
+  echo "Finished packaging version $projectversion, you can run the following command to deploy to your server:"
+  echo
+  echo "deploy/deploy.sh <host-name-of-your-server> <user-name-for-connecting-to-your-server> $projectversion"
+  echo
+  echo
+
+}
+
+displayDockerStartHelp(){
+  echo
+  echo
+  echo "********* Completed deployment *********"
+  echo
+  echo "Completed deploying $projectversion, you can run the following command to start all docker containers on your server"
+  echo
+  echo ssh "$deploy_to_username@$deploy_to_hostname 'cd $destzipfolder && ./start.sh'"
+  echo
+  echo
+
 }
