@@ -5,18 +5,12 @@
    "logLevel":"info"
  },
  "node":{
-   "accept":["default", "demo"]
+   "accept":["default"]
  },
  "applications":[{
     "name":"default",
     "apikey":"k7jc3QcMPKEXGW5UC",
     "url":"https://globalinput.co.uk"
-   },{
-      "name":"demo",
-      "apikey":"AU2FsdGVkX1/DSe6",
-      "url":"https://globalinput.co.uk"
-   }
-
- ]
+   }]
 
 }
