@@ -29,6 +29,7 @@ services:
       - "443:443"
     volumes:
       - ./nginx/data/websites/globalinput:/data/websites/globalinput
+      - ./nginx/var/www/html:/nginx/var/www/html
     links:
       - global_input_node
       - qr_code_node

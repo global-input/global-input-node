@@ -4,7 +4,7 @@ echo "If you have already have docker container named nginx, you need to remove 
 export deploy_to_hostname="$1"
 export deploy_to_username="$2"
 export projectversion="$3"
-export targetenv="$4"
+
 
 source deploy/util.sh
 buildVariables
@@ -16,7 +16,4 @@ echo "unziping ..."
 unzipZipFile
 echo "shell script ..."
 makeSchellScriptExecutable
-echo "uploading the ssl certificates ..."
-uploadSSLCertificated
-echo "starting the docker containers..."
-buildAndStartDocker
+displayDockerStartHelp

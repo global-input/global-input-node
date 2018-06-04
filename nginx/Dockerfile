@@ -8,15 +8,13 @@ RUN rm -v /etc/nginx/nginx.conf
 ADD etc/nginx/nginx.conf /etc/nginx/
 ADD etc/nginx/sites-available /etc/nginx/sites-available
 ADD etc/nginx/ssl /etc/nginx/ssl
-ADD etc/letsencrypt /etc/letsencrypt
-ADD etc/node4567 /etc/node4567
 RUN rm -rf /var/www/html/index.nginx-debian.html
 
 RUN ln -s /etc/nginx/sites-available/globalinput.co.uk /etc/nginx/sites-enabled/globalinput.co.uk
 
 
-
 ADD data/websites/globalinput /data/websites/globalinput
+ADD var/www/html /var/www/html
 
 ADD etc/nginx/esb /etc/nginx/esb
 
