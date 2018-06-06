@@ -5,18 +5,12 @@
    "logLevel":"info"
  },
  "node":{
-   "accept":["default", "demo"]
+   "accept":["default"]
  },
  "applications":[{
     "name":"default",
     "apikey":"k7jc3QcMPKEXGW5UC",
     "url":"http://127.0.0.1:1337"
-   },{
-      "name":"demo",
-      "apikey":"1AU2FsdGVkX1/DSe6",
-      "url":"http://127.0.0.1:1337"
-   }
-
- ]
+  }]
 
 }

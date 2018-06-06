@@ -10,7 +10,7 @@
  "applications":[{
     "name":"default",
     "apikey":"k7jc3QcMPKEXGW5UC",
-    "url":"https://globalinput.co.uk"
+    "url":"http://@@@Your-Server-Domain-Name@@@"
    }]
 
 }
