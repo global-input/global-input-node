@@ -76,13 +76,18 @@ On completion, it will print in the console the instruction to run the next comm
 ```
 deploy/deploy.sh <host-name-of-your-server> <user-name-for-connecting-to-your-server> <version>
 ```
-This will deploy the zip file to the target server, and print out the next command to start all the Docker containers. The command run the start.sh script on the target server to start all the containers.
+This will deploy the zip file to the target server, and print out the next command to start all the Docker containers. The command execute the start.sh script on the target server to start all the containers using the Docker Compose.
 
 
-Finally, you can type the url to your server on your browser:
+Finally, you can type the url to your server on your browser to test it out:
 
+```
 http://<your-domain>/
+```
 
-It should be identifical to https://globalinput.co.uk except the examples there will be using your WebSocket server instead.
+What is running on your browser should be identical to https://globalinput.co.uk except the examples there will be using your WebSocket server instead. The source of the web application you are seeing is available at:
 
-Now you can go to the settings of your Global Input App and change URL to point to your own WebSocket Server.
+https://github.com/global-input/global-input-web
+
+
+You can go to the settings of your Global Input App and change URL to point to your own WebSocket Server.
