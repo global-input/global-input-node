@@ -33,7 +33,3 @@ services:
     links:
       - global_input_node
       - qr_code_node
-networks:
-   default:
-     external:
-       name: iterativesolution_default

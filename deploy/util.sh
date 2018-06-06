@@ -51,16 +51,17 @@ unzipZipFile(){
       executeScript /tmp/script_$uniqueidforfilename.sh
 }
 
+replaceDomainNameInConfig(){
+    echo  'sed -i -e "s,@@@Your-Server-Domain-Name@@@,'$deploy_to_hostname',g" app/config/config.json' >> /tmp/script_$uniqueidforfilename.sh
+}
+
 unzipAndReplaceVariables(){
     uniqueidforfilename=$1
 
     echo "creating the script:/tmp/script_$uniqueidforfilename.sh"
     echo "cd $destzipfolder" > /tmp/script_$uniqueidforfilename.sh
     echo "unzip -o $zipfilename" >> /tmp/script_$uniqueidforfilename.sh
-
-    #echo  'sed -i -e "s,@@@db_user@@@,'$db_user',g" mysql/box-scripts/mysql.env' >> /tmp/script_$uniqueidforfilename.sh
-
-
+    replaceDomainNameInConfig
 }
 makeSchellScriptExecutable(){
     createUniqueidforfilename
