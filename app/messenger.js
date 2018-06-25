@@ -280,7 +280,7 @@ var globalInputMessenger={
             }
             if(receiver.securityGroup !== inputPermissionMessage.securityGroup){
               clientinfologger(inputPermissionMessage, "The  app needs paring",{inputPermissionMessage});
-              this.sendErrorInputPermissionResult(registerItem,inputPermissionMessage,"The app needs pairing with the service application, contact with the service application provider.");
+              this.sendErrorInputPermissionResult(registerItem,inputPermissionMessage,"The Secruity Group Key value mismatch.");
               return;
             };
             clientinfologger(inputPermissionMessage, "the input Permission received from:");
@@ -356,7 +356,7 @@ var globalInputMessenger={
         inputPermissionMessage.allow=false;
         inputPermissionMessage.reason=reason;
         registerItem.socket.emit(inputPermissionMessage.connectSession+"/inputPermissionResult",JSON.stringify(inputPermissionMessage));
-        clientinfologger(inputPermissionMessage,"input Permisson is not allowed:"+reason);        
+        clientinfologger(inputPermissionMessage,"input Permisson is not allowed:"+reason);
     }
 };
 module.exports=globalInputMessenger;
