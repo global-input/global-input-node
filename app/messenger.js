@@ -165,13 +165,14 @@ var globalInputMessenger={
           socket.disconnect(true);
         },7000);
         var onRegister=function(registerMessage){
+              console.log("*******registerMessage:registerMessage:"+registerMessage);
               clearTimeout(disconnectTimeout);
               winstonlogger.log('info',"register message is received");
               try{
                   that.onRegister(socket,JSON.parse(registerMessage));
               }
               catch(error){
-                  that.processError(error," in registerSocket");
+                  that.processError(error," in registerSocket:"+error);
               }
               socket.removeAllListeners("register");
         };
