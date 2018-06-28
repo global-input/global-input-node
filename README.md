@@ -2,22 +2,22 @@
 The global-input-node WebSocket server (Global Input WebSocket Server) is a WebSocket Server, which is implemented to support the data transfer between applications that use the [global-input-message](https://github.com/global-input/global-input-message) JavaScript library to transfer data via the end-to-end encryption. The global-input-message JavaScript library is available at:
 [https://github.com/global-input/global-input-message](https://github.com/global-input/global-input-message).
 
-A WebSocket client application passes unencrypted messsages to the global-input-message JavaScript library, without worrying about the encryption and delivering of the messages. The global-input-message JavaScript library encrypts the message content with the end-to-end encryption and forwards them over to the destination. On the receiving end, the global-input-message JavaScript library receives the encrypted messages, decrypt them and forward the decrypted messages to the callback function that the application has specified.
+A WebSocket client application passes unencrypted messsages to the global-input-message JavaScript library, without worrying about the encryption and delivering of the messages. The global-input-message JavaScript library encrypts the message content with the end-to-end encryption and forwards them over to the destination. On the receiving end, the global-input-message JavaScript library receives the encrypted messages, decrypts them and forwards the decrypted messages to the callback function that the application has specified.
 
 
 The WebSocket server uses API key values to assign the WebSocket workloads to one of the serving nodes (it can be the same node). The WebSocket server looks up the API key value contained in the request from its configuration to decide which WebSocket server node should serve the request. Hence, a WebSocket client application needs to be pre-configured to use one of the accepted API key values in order to be able to connect to the WebSocket server.
 
 ### How It Works
-The end-to-end encryption and the message trasnsporting logic are implemented transparently inside the [global-input-message](https://github.com/global-input/global-input-message) JavaScript library and the [WebSocket server](https://github.com/global-input/global-input-node).  This enables the WebSocket client applications concentrate on the business logic.
+The end-to-end encryption and the message trasnsporting logic are implemented transparently inside the [global-input-message](https://github.com/global-input/global-input-message) JavaScript library and the [WebSocket server](https://github.com/global-input/global-input-node).  This enables the WebSocket client applications to concentrate on the business logic.
 
 ###### Receiver Application
-A ```global-input-message``` application is a ```reiceiver application``` if it connects to the WebSocket server and waits for connection from another application.
+A ```global-input-message``` application is a ```receiver application``` if it connects to the WebSocket server and waits for connection from another application.
 
 ###### Calling Application
-A ```global-input-message``` application is a ```calling application``` if it requests to connet to the ```Receiver application```.
+A ```global-input-message``` application is a ```calling application``` if it requests to connet to the ```receiver application```.
 
 ###### QR Code
-A ```receiver application``` uses QR Code to pre-share the necessary information with the ```calling application``` to let the ```calling application``` to find the ```Receiver``` application and establish the communication using the end-to-end encryption.
+A ```receiver application``` uses a QR Code to pre-share the necessary information with the ```calling application``` to let the ```calling application``` find the ```receiver application``` and establish the communication using the end-to-end encryption.
 
 The QR code contains the following information:
 (1) The ```url``` value of the WebSocket server that the ```receiver application``` has connected.
@@ -95,7 +95,7 @@ On completion, in the console, it will print the instruction on running the next
 ```
 deploy/deploy.sh <host-name-of-your-server> <user-name-for-connecting-to-your-server> <version>
 ```
-Executing the command above deploy the zip file to the target server.
+Executing the command above will deploy the zip file to the target server.
 
 On completion, in the console, it will also print the instruction on running the next command to start all the Docker containers.
 
