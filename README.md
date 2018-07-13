@@ -1,7 +1,5 @@
 # global-input-node
-The global-input-node WebSocket server (Global Input WebSocket Server) is part of the Global Input Platform (https://globalinput.co.uk/global-input-app/paltform), which is implemented to support the data transfer between applications that use the Global Input JavaScript [global-input-message](https://github.com/global-input/global-input-message)  library to transfer data via the end-to-end encryption. The global-input-message JavaScript library is available at:
-[https://github.com/global-input/global-input-message](https://github.com/global-input/global-input-message).
-
+The Global Input WebSocket server (global-input-node) is part of the Global Input Platform (https://globalinput.co.uk/global-input-app/paltform), which is implemented to support the data transfer between applications that use the Global Input JavaScript [global-input-message](https://github.com/global-input/global-input-message)  library to transfer data using end-to-end encryption.
 
 ### Download the source code
 Run the following commands to install the WebSocket server:
