@@ -165,13 +165,14 @@ var globalInputMessenger={
           socket.disconnect(true);
         },7000);
         var onRegister=function(registerMessage){
+              console.log("*******registerMessage:registerMessage:"+registerMessage);
               clearTimeout(disconnectTimeout);
               winstonlogger.log('info',"register message is received");
               try{
                   that.onRegister(socket,JSON.parse(registerMessage));
               }
               catch(error){
-                  that.processError(error," in registerSocket");
+                  that.processError(error," in registerSocket:"+error);
               }
               socket.removeAllListeners("register");
         };
@@ -280,7 +281,7 @@ var globalInputMessenger={
             }
             if(receiver.securityGroup !== inputPermissionMessage.securityGroup){
               clientinfologger(inputPermissionMessage, "The  app needs paring",{inputPermissionMessage});
-              this.sendErrorInputPermissionResult(registerItem,inputPermissionMessage,"The app needs pairing with the service application, contact with the service application provider.");
+              this.sendErrorInputPermissionResult(registerItem,inputPermissionMessage,"The Secruity Group Key value mismatch.");
               return;
             };
             clientinfologger(inputPermissionMessage, "the input Permission received from:");
@@ -356,7 +357,7 @@ var globalInputMessenger={
         inputPermissionMessage.allow=false;
         inputPermissionMessage.reason=reason;
         registerItem.socket.emit(inputPermissionMessage.connectSession+"/inputPermissionResult",JSON.stringify(inputPermissionMessage));
-        clientinfologger(inputPermissionMessage,"input Permisson is not allowed:"+reason);        
+        clientinfologger(inputPermissionMessage,"input Permisson is not allowed:"+reason);
     }
 };
 module.exports=globalInputMessenger;
