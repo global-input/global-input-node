@@ -17,12 +17,12 @@
   },
   "homepage": "https://github.com/global-input/global-input-node#readme",
   "dependencies": {
-    "body-parser": "^1.17.2",
-    "express": "^4.15.3",
+    "body-parser": "^1.18.3",
+    "express": "^4.16.3",
     "http": "0.0.0",
     "minimist": "^1.2.0",
     "qrcode": "^0.9.0",
     "querystring": "^0.2.0",
-    "winston": "^2.3.1"
+    "winston": "^2.4.3"
   }
 }
