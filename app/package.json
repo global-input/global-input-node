@@ -4,7 +4,7 @@
   "description": "Global Input Node Server",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js --config config/def.json",
+    "start": "node server.js --config config/local.json",
     "test": "jest"
   },
   "repository": {
