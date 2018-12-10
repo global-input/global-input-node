@@ -85,6 +85,7 @@ var globalInputMessenger={
         }
         else{
             winstonlogger.log('error',"config file does not exist",{configPath:configPath});
+            throw Error("Config file does not exist:"+configPath);
         }
 
     },
