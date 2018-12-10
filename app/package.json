@@ -4,7 +4,8 @@
   "description": "Global Input Node Server",
   "main": "server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node server.js --config config/def.json",
+    "test": "jest"
   },
   "repository": {
     "type": "git",
@@ -24,5 +25,8 @@
     "querystring": "^0.2.0",
     "socket.io": "^2.1.0",
     "winston": "^2.4.3"
+  },
+  "devDependencies": {
+    "jest": "^23.6.0"
   }
 }
