@@ -1,6 +1,6 @@
 #ubuntu 16.04 xenial
 apt-get update
-apt-get install software-properties-common
+apt-get install -y software-properties-common
 add-apt-repository ppa:certbot/certbot
 apt-get update
 apt-get install python-certbot-nginx
