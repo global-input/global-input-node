@@ -8,8 +8,7 @@ getProjectVersionFromPom(){
 buildVariables(){
   export zipfilename="$projectName-$projectversion.zip"
   export sourcezipfilepath="package/target/$zipfilename"
-  export destzipfolder="$projectName"
-  export nodeworkfolder="package/target/app"
+  export destzipfolder="$projectName"  
 }
 
 executeScript(){
