@@ -10,7 +10,21 @@
  "applications":[{
     "name":"default",
     "apikey":"k7jc3QcMPKEXGW5UC",
-    "url":"http://@@@Your-Server-Domain-Name@@@"
-   }]
+    "url":"https://node1.udinput.co.uk"
+   },{
+      "name":"demo",
+      "apikey":"AU2FsdGVkX1/DSe6",
+      "url":"https://node1.udinput.co.uk"
+   },{
+      "name":"website",
+      "apikey":"UuPqSvBbNtGBp6ibp",
+      "url":"https://node1.udinput.co.uk"
+   },{
+      "name":"mobile",
+      "apikey":"SOh85GNXT8TXLCTEc",
+      "url":"https://node1.udinput.co.uk"
+   }
+
+ ]
 
 }

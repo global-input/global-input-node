@@ -16,6 +16,6 @@ spec:
     spec:
       containers:
       - name: gianode
-        image: index.docker.io/dilshat/global_input_node:1.2.2
+        image: index.docker.io/dilshat/global_input_node:1.2.3
         ports:
         - containerPort: 1337

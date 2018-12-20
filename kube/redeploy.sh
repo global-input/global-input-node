@@ -1,2 +1,2 @@
 #kubectl delete deployment gianode-deployment
-kubectl apply -f kube/deployment.yaml
+kubectl create -f kube/deployment.yaml

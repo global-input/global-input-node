@@ -2,6 +2,7 @@ server {
 	listen 80;
         server_name globalinput.co.uk www.globalinput.co.uk;
 
+
 	 access_log  /var/log/nginx/access.log;
      error_log  /var/log/nginx/error.log;
      root /data/websites/globalinput;
@@ -12,4 +13,5 @@ server {
 		  location /global-input-app {
    			try_files $uri /index.html;
  			}
+			
 }
