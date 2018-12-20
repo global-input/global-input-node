@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gianode-deployment
+  labels:
+    app: giaapp
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: giaapp
+  template:
+    metadata:
+      labels:
+        app: giaapp
+    spec:
+      containers:
+      - name: gianode
+        image: index.docker.io/dilshat/global_input_node:1.2.3
+        ports:
+        - containerPort: 1337
