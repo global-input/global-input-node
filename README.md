@@ -1,5 +1,5 @@
 # global-input-node
-The Global Input WebSocket server (global-input-node) is part of the Global Input Platform (https://globalinput.co.uk/global-input-app/paltform), which is implemented to support the data transfer between applications that use the Global Input JavaScript [global-input-message](https://github.com/global-input/global-input-message)  library to transfer data using end-to-end encryption.
+The Global Input WebSocket server (global-input-node) provides a secure communication mechanism between the Global Input App (https://globalinput.co.uk/) and the applications running on devices. The device-to-device communication is secured with the end-to-end encryption. The communicating applications need to include the [global-input-message](https://github.com/global-input/global-input-message)  extension library to communicate with each other securely.
 
 ### Download the source code
 Run the following commands to install the WebSocket server:
@@ -50,40 +50,18 @@ Assuming that you are still in the ```app``` folder, type the following command 
 nodejs  server.js
 ```
 
-### Build and Deploy with Docker Containers
-Prerequisite of this section:
-1. Install the maven build tool on your workstation.
-2. Install Docker and [Docker Compose](https://docs.docker.com/compose/install/) on your target server
-
-Change your current folder to the WebSocket Server workspace folder. If you are still in its ```app``` subfolder, change to its parent:
+### Docker Image
 ```
-cd ..
+docker run -d --name global_input_node -p 1337:1337 -i -t \
+-v /root/globalinput/app:/app \
+dilshat/global_input_node:1.2.1
 ```
-Then type the following command, which will create a deployment zip file:
+If you would like to put Nginx in front:
 ```
-deploy/package.sh
+docker run -d --name global_input_nginx -p 80:80 -p 443:443  -i -t -v /root/globalinput/etc/nginx/esb:/etc/nginx/esb \
+-v /root/globalinput/etc/nginx/sites-available:/etc/nginx/sites-available \
+-v /root/globalinput/etc/nginx/ssl:/etc/nginx/ssl \
+-v /root/globalinput/web:/data/websites/globalinput \
+-v /root/globalinput/web:/var/www/html \
+dilshat/global_input_nginx:1.2.7
 ```
-
-On completion, in the console, it will print the instruction on running the next command to deploy the zip file to your server.
-
-```
-deploy/deploy.sh <host-name-of-your-server> <user-name-for-connecting-to-your-server> <version>
-```
-Executing the command above deploy the zip file to the target server.
-
-On completion, in the console, it will also print the instruction on running the next command to start all the Docker containers.
-
-The shell script in the command executes the start.sh script on the target server to start all the containers using the Docker Compose.
-
-Finally, you can test it out on your browser:
-
-```
-http://<your-domain>/
-```
-
-What is displaying on your browser should be identical to https://globalinput.co.uk except the examples there will be using your own WebSocket server instead. The source of the web application you are seeing is available at:
-
-https://github.com/global-input/global-input-web
-
-
-You can go to the settings of your Global Input App and change URL to point to your own WebSocket Server.
