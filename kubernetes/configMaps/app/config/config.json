@@ -5,24 +5,24 @@
    "logLevel":"info"
  },
  "node":{
-   "accept":["default"]
+   "accept":["default", "demo", "website","mobile"]
  },
  "applications":[{
     "name":"default",
     "apikey":"k7jc3QcMPKEXGW5UC",
-    "url":"http://192.168.0.32:1337"
+    "url":"http://local.globalinput.co.uk"
    },{
       "name":"demo",
       "apikey":"AU2FsdGVkX1/DSe6",
-      "url":"http://192.168.0.32:1337"
+      "url":"http://local.globalinput.co.uk"
    },{
       "name":"website",
       "apikey":"UuPqSvBbNtGBp6ibp",
-      "url":"http://192.168.0.32:1337"
+      "url":"http://local.globalinput.co.uk"
    },{
       "name":"mobile",
       "apikey":"SOh85GNXT8TXLCTEc",
-      "url":"http://192.168.0.32:1337"
+      "url":"http://local.globalinput.co.uk"
    }
 
  ]
