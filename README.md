@@ -65,5 +65,5 @@ let mobileConfig={
 
 Websockets are persistent contrary to those on the RestAPI calls. This means that a large number of connections needs to be kept open simultaneously. Although the workloads of processes are distributed across the nodes, the long-running WebSocket connections themselves will be increasing burden on the load balancer itself.
 
-In the GIA WebSocket Loadbalancing Strategy, in order to resolve this limitation, every WebSocket session is started with an initial RestAPI call on the LoadBalancer to obtain the URL of a WebSocket Server node, so that the application will connect to the WebSocket node directly without going through the load balancer. The sequence of actions in the process for starting a WebSocket connection is depicted in the following diagram:
+In the GIA WebSocket Loadbalancing Strategy, in order to resolve this limitation, every WebSocket session is started with an initial RestAPI call on the LoadBalancer to obtain the URL of a WebSocket Server node, so that the application will connect to the WebSocket node directly without going through the load balancer. The sequence of actions in the process for starting a WebSocket connection is shown in the following diagram:
 ![WebSocket Server Loadbalancing](https://media.iterativesolution.co.uk/images/websocket-server.png)
