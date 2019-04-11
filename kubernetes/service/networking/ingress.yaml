@@ -1,0 +1,20 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: global-input
+spec:
+  backend:
+    serviceName: global-input-service
+    servicePort: 1337
+  rules:
+  - host: local.globalinput.co.uk
+    http:
+      paths:
+      - path: /global-input
+        backend:
+          serviceName: global-input-service
+          servicePort: 1337
+      - path: /socket.io
+        backend:
+          serviceName: global-input-service
+          servicePort: 1337

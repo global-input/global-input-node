@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: globalinput-node-deployment
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: global-input-node
+  minReadySeconds: 5
+  template:
+    metadata:
+      labels:
+        app: global-input-node
+    spec:
+      containers:
+      - name:  globalinput-node
+        image: dilshat/global_input_node:1.2.1
+        ports:
+        - containerPort: 1337
+        volumeMounts:
+          - name: config-vol
+            mountPath: /app/config
+      volumes:
+      - name: config-vol
+        configMap:
+          name: globalinput.node.config2

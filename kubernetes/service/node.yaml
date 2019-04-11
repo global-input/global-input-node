@@ -1,0 +1,12 @@
+apiVersion: apps/v1
+kind: Service
+apiVersion: v1
+metadata:
+  name: global-input-service
+spec:
+  selector:
+    app: global-input-node
+  ports:
+  - protocol: TCP
+    port: 1337
+    targetPort: 1337

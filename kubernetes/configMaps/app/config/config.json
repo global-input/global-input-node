@@ -1,0 +1,30 @@
+{
+ "port":1337,
+ "namespace":"",
+ "winston":{
+   "logLevel":"info"
+ },
+ "node":{
+   "accept":["default", "demo", "website","mobile"]
+ },
+ "applications":[{
+    "name":"default",
+    "apikey":"k7jc3QcMPKEXGW5UC",
+    "url":"http://local.globalinput.co.uk"
+   },{
+      "name":"demo",
+      "apikey":"AU2FsdGVkX1/DSe6",
+      "url":"http://local.globalinput.co.uk"
+   },{
+      "name":"website",
+      "apikey":"UuPqSvBbNtGBp6ibp",
+      "url":"http://local.globalinput.co.uk"
+   },{
+      "name":"mobile",
+      "apikey":"SOh85GNXT8TXLCTEc",
+      "url":"http://local.globalinput.co.uk"
+   }
+
+ ]
+
+}
