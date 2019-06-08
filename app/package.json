@@ -27,6 +27,6 @@
     "winston": "^2.4.3"
   },
   "devDependencies": {
-    "jest": "^23.6.0"
+    "jest": "^24.8.0"
   }
 }
