@@ -26,7 +26,7 @@ The value of the ```apikey``` parameter is used to control which device applicat
 ```
 nodejs  server.js
 ```
-Alternative, you can build a docker image using the script the repository or download from the [docker hub](https://cloud.docker.com/u/dilshat/repository/docker/dilshat/global_input_node). You may place a [a Nginx load balancer](https://cloud.docker.com/repository/docker/dilshat/global_input_nginx) in front of a set of WebSocket instances to achieve the scalability.
+Alternative, you can build a docker image using the script the repository or download from the [docker hub](https://cloud.docker.com/u/dilshat/repository/docker/dilshat/global_input_node). You may place a [Nginx load balancer](https://cloud.docker.com/repository/docker/dilshat/global_input_nginx) in front of a set of WebSocket instances to achieve the scalability.
 
 
 
