@@ -1,0 +1,17 @@
+{
+    "port":1337,
+    "applications":[{
+       "name":"default",
+       "apikey":"k7jc3QcMPKEXGW5UC",
+       "url":"http://127.0.1:1337"
+      }
+    ],
+    "namespace":"",
+    "winston":{
+      "logLevel":"info"
+    },
+    "node":{
+      "accept":["default"]
+    }
+   }
+   
