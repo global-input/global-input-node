@@ -1,14 +1,8 @@
-# global-input-node
-This is a Global Input App(GIA) WebSocket server, responsible for routing encrypted messages between device applications,  and is one of the constituent parts of [the GIA mobile integration solution](https://globalinput.co.uk/). The [Global Input App(GIA)](https://globalinput.co.uk/) with its extensions provides a universal mobile integration solution for web and device applications, allowing users to use mobiles to operate on those applications, and provides the following functionalities:
- - [Mobile Authentication](https://globalinput.co.uk/global-input-app/mobile-authentication)
- - [Mobile Input & Control](https://globalinput.co.uk/global-input-app/mobile-input-control)
- - [Second Screen Experience](https://globalinput.co.uk/global-input-app/second-screen-experience)
- - [Mobile Personal Storage](https://globalinput.co.uk/global-input-app/mobile-personal-storage)
- - [Mobile Encryption & Signing](https://globalinput.co.uk/global-input-app/mobile-content-encryption)
- - [Mobile Content Transfer](https://globalinput.co.uk/global-input-app/mobile-content-transfer)
+# Global Input App WebSocket Server
+This is a WebSocket server responsible for relaying encrypted messages between devices. Being as part of the Mobile Integration Platform powered by [Global Input App](https://globalinput.co.uk/), which secures data using end-to-end encryption at the device-to-device level, it can run on an unsecured infrastructure. 
 
 ### Download
-Download the Node.JS application and its dependencies :
+Download the application:
 ```shell
     git clone https://github.com/global-input/global-input-node.git
     cd global-input-node
@@ -17,7 +11,7 @@ Download the Node.JS application and its dependencies :
 ```
 
 ### Modify the Configuration
-Open the configuration file [/app/config/config.json](https://github.com/global-input/global-input-node/blob/master/app/config/config.json), locate the url attribute:
+The configuration file [/app/config/config.json](https://github.com/global-input/global-input-node/blob/master/app/config/config.json) contains the information to inform the devices how to connect to the WebSocket server:
 ```
 ....
     "name":"default",
@@ -25,45 +19,12 @@ Open the configuration file [/app/config/config.json](https://github.com/global-
     "url":"https://node3.globalinput.co.uk"
 ...       
 ```
-and modify its value to point to your own GIA WebSocket server instance.  The URL is going to be used by both the application running on your device and the Global Input App running on your mobile, to connect to your WebSocket server instance. Hence,  the URL should be reachable from the network that your devices are connected to. For example, if you use a URL with an internal network address, the device and your mobile should be connected to the same network.
+The value of the ```apikey``` parameter is used to control which device applications can use the resource represented by the Web Socket server, and it does not have any data security implication.  You can modify the value of the ```url``` parameter to reflect the infrastructure that is set up to run your WebSocket server. The ```url``` should be reachable to both the device application and the mobile app (Global Input App) in order to communicate with each other.
 
-### Run the WebSock server
-run the Node application:
+### Run an instance.
+
 ```
 nodejs  server.js
 ```
-This repository also contains the scripts for building the docker images for [the WebSocket Server Container](https://cloud.docker.com/u/dilshat/repository/docker/dilshat/global_input_node) and [the Nginx Reverse Proxy Container](https://cloud.docker.com/repository/docker/dilshat/global_input_nginx) .  
+Alternative, you can build a docker image, or download and run from [docker hub](https://cloud.docker.com/u/dilshat/repository/docker/dilshat/global_input_node). You may place a [the Nginx load balancer](https://cloud.docker.com/repository/docker/dilshat/global_input_nginx) in front to manage multiple instances.  
 
-### Configuring the GIA Extensions
-
-The details of the communication between the WebSocket server are encapsulated within the GIA extensions so that applications can just provide mobile user interfaces and callbacks to process mobile events. The GIA extensions are:
-
- - [GIA Chrome Extension](https://github.com/global-input/chrome-extension)
- - [GIA WordPress Plugin](https://github.com/global-input/wordpress-login))
- - [GIA React Extension](https://github.com/global-input/global-input-react))
- - [GIA JS Extension](https://github.com/global-input/global-input-message)
-
-A GIA extension library connects to a GIA WebSocket server and displays an Encrypted QR Code to tell GIA how to connect to it.  The URL of the WebSocket server and the APIKey value required connecting to the WebSocket server
-are contained in the Encrypted QR Code contains
-If you are using [the GIA Chrome Extension](https://github.com/global-input/chrome-extension), click on ```Communication Settings``` in the extension window. You can modify the WebSocket URL and the API key values that are used by the GIA Chrome extension to connect to the WebSocket server.
-
-If you are using the [GIA React Extension]([https://github.com/global-input/global-input-react](https://github.com/global-input/global-input-react)) or [the GIA JS Extension](https://github.com/global-input/global-input-message),  you can  set the URL and APIKey value of your WebSocket server in the mobile config:
-```
-let mobileConfig={			
-		url:<url to your websocket server>,
-        apikey:<apikey required for connection>,
-		initData:{
-			form:{
-			  ...
-			}
-
-		}
-```
-
-
-### GIA WebSocket Load Balancing Strategy
-
-Websockets are persistent contrary to those on the RestAPI calls. This means that a large number of connections needs to be kept open simultaneously. Although the workloads of processes are distributed across the nodes, the long-running WebSocket connections themselves will be increasing burden on the load balancer itself.
-
-In the GIA WebSocket Loadbalancing Strategy, in order to resolve this limitation, every WebSocket session is started with an initial RestAPI call on the LoadBalancer to obtain the URL of a WebSocket Server node, so that the application will connect to the WebSocket node directly without going through the load balancer. The sequence of actions in the process for starting a WebSocket connection is shown in the following diagram:
-![WebSocket Server Loadbalancing](https://media.iterativesolution.co.uk/images/websocket-server.png)
