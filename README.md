@@ -1,8 +1,9 @@
 # Global Input App WebSocket Server
-This is a WebSocket server responsible for relaying encrypted messages between devices. Being as part of the Mobile Integration Platform powered by [Global Input App](https://globalinput.co.uk/), which secures data using end-to-end encryption at the device-to-device level, it can run on an unsecured infrastructure. 
+This is a WebSocket server responsible for relaying encrypted messages between devices. 
+Because the Mobile Integration Platform, which is powered by [Global Input App](https://globalinput.co.uk/), secures data using end-to-end encryption at the device-to-device level, the WebSocket server can run on an unsecured infrastructure. 
 
 ### Download
-Download the application:
+Download the application source code:
 ```shell
     git clone https://github.com/global-input/global-input-node.git
     cd global-input-node
