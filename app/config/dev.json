@@ -1,16 +1,21 @@
 {
-    "port":1337,
-    "applications":[{
-       "name":"default",
-       "apikey":"k7jc3QcMPKEXGW5UC",
-       "url":"http://192.168.0.22:1337"
-      }
-    ],
-    "namespace":"",
-    "winston":{
-      "logLevel":"info"
+  "port": 1337,
+  "applications": [{
+      "name": "default",
+      "apikey": "k7jc3QcMPKEXGW5UC",
+      "url": "http://192.168.0.22:1337"
     },
-    "node":{
-      "accept":["default"]
+    {
+      "name": "videoBroadCaster",
+      "apikey": "13HjvltQOOjQodWoVsrl",
+      "url": "http://192.168.0.22:1337"
     }
-   }
+  ],
+  "namespace": "",
+  "winston": {
+    "logLevel": "info"
+  },
+  "node": {
+    "accept": ["default", "videoBroadCaster"]
+  }
+}

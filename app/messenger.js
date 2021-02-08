@@ -2,28 +2,41 @@ var fs = require('fs');
 const minimist = require('minimist');
 const winston = require('winston');
 
-var winstonlogger = new (winston.Logger)({
+var winstonLogger = new (winston.Logger)({
   transports: [
     new (winston.transports.Console)({ 'timestamp': true })
   ]
 });
 
-var clientinfologger = function (request, message, extrainfo) {
+function parseVideoConnect(clientId) {
+  let mediaHost = null;
+  let mediaRole = null;
+  if (clientId && clientId.startsWith('video://')) {
+    let res = clientId.slice('video://'.length);
+    mediaHost = res.slice(0, res.indexOf('/'));
+    res = res.slice(res.indexOf('/') + 1);
+    mediaRole = res.slice(0, res.indexOf('/'));
+
+  }
+  return { mediaHost, mediaRole };
+}
+
+var clientInfoLogger = function (request, message, extraInfo) {
   if (request && request.client) {
-    if (extrainfo) {
-      winstonlogger.log('info', "client:" + request.client + ":" + message, extrainfo);
+    if (extraInfo) {
+      winstonLogger.log('info', "client:" + request.client + ":" + message, extraInfo);
     }
     else {
-      winstonlogger.log('info', "client:" + request.client + ":" + message);
+      winstonLogger.log('info', "client:" + request.client + ":" + message);
     }
 
   }
   else {
-    if (extrainfo) {
-      winstonlogger.log('info', message, extrainfo);
+    if (extraInfo) {
+      winstonLogger.log('info', message, extraInfo);
     }
     else {
-      winstonlogger.log('info', message);
+      winstonLogger.log('info', message);
     }
 
   }
@@ -50,17 +63,17 @@ var globalInputMessenger = {
     this.processArguments(argv);
     this.loadConfig();
     if (this.config.namespace) {
-      this.ionamespace = io.of(this.config.namespace);
+      this.ioNamespace = io.of(this.config.namespace);
     }
     else {
-      this.ionamespace = io;
+      this.ioNamespace = io;
     }
     console.log("Copyright © 2017-2022 by Dilshat Hewzulla");
-    this.ionamespace.on("connect", this.onConnect.bind(this));
+    this.ioNamespace.on("connect", this.onConnect.bind(this));
   },
   processArguments: function (argv) {
     var pathToConfigFile = minimist(argv).config;
-    console.log("********:" + pathToConfigFile);
+    console.log("pathToConfigFile:" + pathToConfigFile);
     if (!pathToConfigFile) {
       this.configPath = "config/config.json";
 
@@ -69,7 +82,7 @@ var globalInputMessenger = {
     else {
       this.configPath = pathToConfigFile;
     }
-    winstonlogger.log('info', "using config file path", { configPath: this.configPath });
+    winstonLogger.log('info', "using config file path", { configPath: this.configPath });
   },
 
   loadConfig: function () {
@@ -84,7 +97,7 @@ var globalInputMessenger = {
       winston.level = this.config.winston.logLevel;
     }
     else {
-      winstonlogger.log('error', "config file does not exist", { configPath: configPath });
+      winstonLogger.log('error', "config file does not exist", { configPath: configPath });
       throw Error("Config file does not exist:" + configPath);
     }
 
@@ -102,18 +115,18 @@ var globalInputMessenger = {
       apikey = query.apikey;
     }
     if (!apikey) {
-      winstonlogger.log('info', "apikey is empty");
-      this.sockerServerDenied(req, res, "apikey is empty");
+      winstonLogger.log('info', "apikey is empty");
+      this.socketServerDenied(req, res, "apikey is empty");
       return;
     }
     var application = this.getApplicationByApikey(apikey);
     if (application) {
-      winstonlogger.log('info', "granted socket url ", { application });
+      winstonLogger.log('info', "granted socket url ", { application });
       this.socketServerGranted(req, res, application);
     }
     else {
-      winstonlogger.log('info', "denied socket url ", { apikey });
-      this.sockerServerDenied(req, res, "apikey does not match");
+      winstonLogger.log('info', "denied socket url ", { apikey });
+      this.socketServerDenied(req, res, "apikey does not match");
     }
 
 
@@ -126,7 +139,7 @@ var globalInputMessenger = {
     };
     res.end(JSON.stringify(data));
   },
-  sockerServerDenied: function (req, res, reason) {
+  socketServerDenied: function (req, res, reason) {
     res.writeHead(401, httpResponseHeader);
     var data = {
       result: "failed",
@@ -136,11 +149,11 @@ var globalInputMessenger = {
   },
 
   logger: function (err, req, res, next) {
-    winstonlogger.log('info', "request received");
+    winstonLogger.log('info', "request received");
     next(err)
   },
   processError: function (error, message) {
-    winstonlogger.log('error', message, { error });
+    winstonLogger.log('error', message, { error });
   },
   getApplicationByApikey: function (apikey) {
     var matched = this.config.applications.filter((app) => app.apikey === apikey);
@@ -153,22 +166,21 @@ var globalInputMessenger = {
   },
 
   onConnect: function (socket) {
-    winstonlogger.log('info', " a socket connected", { id: socket.id });
+    winstonLogger.log('info', " a socket connected", { id: socket.id });
 
 
     socket.on("disconnect", function () {
-      winstonlogger.log('info', " a socket disconnected", { id: socket.id });
+      winstonLogger.log('info', " a socket disconnected", { id: socket.id });
 
     });
     var that = this;
     var disconnectTimeout = setTimeout(function () {
-      winstonlogger.log('info', "disconnected the socket because of the timeout", { id: socket.id });
+      winstonLogger.log('info', "disconnected the socket because of the timeout", { id: socket.id });
       socket.disconnect(true);
     }, 7000);
     var onRegister = function (registerMessage) {
-      console.log("*******registerMessage:registerMessage:" + registerMessage);
       clearTimeout(disconnectTimeout);
-      winstonlogger.log('info', "register message is received");
+      winstonLogger.log('info', "register message is received");
       try {
         that.onRegister(socket, JSON.parse(registerMessage));
       }
@@ -185,7 +197,7 @@ var globalInputMessenger = {
   },
   sendFailedRegisterMessage: function (socket, request, errorMessage) {
     try {
-      winstonlogger.log('info', errorMessage);
+      winstonLogger.log('info', errorMessage);
       var registeredMessage = {
         result: "failed",
         reason: errorMessage
@@ -195,25 +207,35 @@ var globalInputMessenger = {
 
     }
     catch (error) {
-      winstonlogger.log('error', "failed to send register-denied message", { error });
+      winstonLogger.log('error', "failed to send register-denied message", { error });
     }
+  },
+  findRegisteredItemsByClientRole: function (roleToMatch) {
+    const matched = [];
+    for (let [key, value] of this.registry) {
+      const { mediaHost, mediaRole } = parseVideoConnect(value.client);
+      if (mediaRole === roleToMatch) {
+        matched.push(value);
+      }
+    }
+    return matched;
   },
   onRegister: function (socket, request) {
 
     var matchedApplication = this.getApplicationByApikey(request.apikey);
     if (!matchedApplication) {
-      clientinfologger(request, "api key is not valid:" + request.apikey);
+      clientInfoLogger(request, "api key is not valid:" + request.apikey);
       this.sendFailedRegisterMessage(socket, request, "apikey is not valid");
       return false;
     }
     var matchedNode = this.config.node.accept.filter(m => m === matchedApplication.name);
 
     if (matchedNode.length === 0) {
-      this.sendFailedRegisterMessage(socket, request, "wrong node");
+      this.sendFailedRegisterMessage(socket, request, "application name is not in the accept list");
       return false;
     }
     else {
-      clientinfologger(request, "client application connected", { matchedApplication });
+      clientInfoLogger(request, "client application connected", { matchedApplication });
 
 
     }
@@ -229,46 +251,79 @@ var globalInputMessenger = {
       client: request.client,
       time: new Date()
     };
+    const { mediaHost, mediaRole } = parseVideoConnect(registerItem.client);
     this.registry.set(registerItem.session, registerItem);
     socket.on("disconnect", function () {
+      if (mediaHost && mediaRole) {
+        const senders = that.findRegisteredItemsByClientRole('sender');
+        senders.forEach(s => {
+          socket.to(s.socket.id).emit("video/receiver/disconnected", socket.id);
+        });
+      }
       that.registry.delete(registerItem.session);
-      clientinfologger(request, "removed from the registry", { session: registerItem.session, size: that.registry.size });
-    });
-    clientinfologger(request, "registered", { session: registerItem.session, size: this.registry.size });
 
+      clientInfoLogger(request, "removed from the registry", { session: registerItem.session, size: that.registry.size });
+    });
+    clientInfoLogger(request, "registered", { session: registerItem.session, size: this.registry.size });
     socket.on("inputPermision", function (data) {
       try {
         that.onInputPermission(registerItem, JSON.parse(data));
       }
       catch (error) {
 
-        winstonlogger.log('error', "error processing the inputPermision message" + error);
-        clientinfologger(request, "error processing the inputPermision message" + error);
+        winstonLogger.log('error', "error processing the input Permission message" + error);
+        clientInfoLogger(request, "error processing the input Permission message" + error);
         that.processError(error, " in requestJoin");
       }
       socket.removeAllListeners("inputPermision");
     });
+    if (mediaHost && mediaRole) {
+      socket.on("video/video-ready", () => {
+        socket.broadcast.emit("video/video-ready");
+      });
+      socket.on("video/watch", () => {
+        const senders = that.findRegisteredItemsByClientRole('sender');
+        senders.forEach(s => {
+          socket.to(s.socket.id).emit("video/watch", socket.id);
+        });
+
+      });
+      socket.on("video/ask", (id, message) => {
+        socket.to(id).emit("video/ask", socket.id, message);
+      });
+      socket.on("video/answer", (id, message) => {
+        socket.to(id).emit("video/answer", socket.id, message);
+      });
+      socket.on("video/candidate", (id, message) => {
+        socket.to(id).emit("video/candidate", socket.id, message);
+      });
+
+
+    }
+
+
+
     var registeredMessage = {
       result: "ok",
     }
-    clientinfologger(request, "registered message is sent");
+    clientInfoLogger(request, "registered message is sent");
     socket.emit("registered", JSON.stringify(registeredMessage));
   },
   onInputPermission: function (registerItem, inputPermissionMessage) {
 
     if (registerItem.client !== inputPermissionMessage.client) {
-      clientinfologger(inputPermissionMessage, "wrong client value", { inputPermissionMessag });
+      clientInfoLogger(inputPermissionMessage, "wrong client value", { inputPermissionMessage });
       this.sendErrorInputPermissionResult(registerItem, inputPermissionMessage, "Wrong client value");
       return;
     }
     if (registerItem.session !== inputPermissionMessage.session) {
 
-      clientinfologger(inputPermissionMessage, "wrong session value", { inputPermissionMessage });
+      clientInfoLogger(inputPermissionMessage, "wrong session value", { inputPermissionMessage });
       this.sendErrorInputPermissionResult(registerItem, inputPermissionMessage, "Wrong session value");
       return;
     }
     if (!inputPermissionMessage.connectSession) {
-      clientinfologger(inputPermissionMessage, "input permission message missing connectSession");
+      clientInfoLogger(inputPermissionMessage, "input permission message missing connectSession");
 
 
       this.sendErrorInputPermissionResult(registerItem, inputPermissionMessage, "Missing connectSession value");
@@ -276,56 +331,56 @@ var globalInputMessenger = {
     }
     const receiver = this.registry.get(inputPermissionMessage.connectSession);
     if (receiver == null) {
-      clientinfologger(inputPermissionMessage, "The session does not exist", { inputPermissionMessage });
+      clientInfoLogger(inputPermissionMessage, "The session does not exist", { inputPermissionMessage });
       this.sendErrorInputPermissionResult(registerItem, inputPermissionMessage, "The session does not exist");
       return;
     }
     if (receiver.securityGroup !== inputPermissionMessage.securityGroup) {
-      clientinfologger(inputPermissionMessage, "The  app needs paring", { inputPermissionMessage });
-      this.sendErrorInputPermissionResult(registerItem, inputPermissionMessage, "The Secruity Group Key value mismatch.");
+      clientInfoLogger(inputPermissionMessage, "The  app needs paring", { inputPermissionMessage });
+      this.sendErrorInputPermissionResult(registerItem, inputPermissionMessage, "The Security Group Key value mismatch.");
       return;
     };
-    clientinfologger(inputPermissionMessage, "the input Permission received from:");
+    clientInfoLogger(inputPermissionMessage, "the input Permission received from:");
 
     var that = this;
     var onInputPermissionResult = function (data) {
-      clientinfologger(inputPermissionMessage, "inputPermissionResult is received");
+      clientInfoLogger(inputPermissionMessage, "inputPermissionResult is received");
 
 
       try {
         that.onInputPermissionResult(registerItem, inputPermissionMessage, receiver, JSON.parse(data));
       }
       catch (error) {
-        clientinfologger(inputPermissionMessage, error + " in  processJoinRequestResult");
+        clientInfoLogger(inputPermissionMessage, error + " in  processJoinRequestResult");
         that.sendErrorInputPermissionResult(registerItem, inputPermissionMessage, error);
       }
       receiver.socket.removeListener(receiver.session + "/inputPermissionResult", onInputPermissionResult);
     };
     receiver.socket.on(receiver.session + "/inputPermissionResult", onInputPermissionResult);
-    clientinfologger(inputPermissionMessage, "sending inputPermission message");
+    clientInfoLogger(inputPermissionMessage, "sending inputPermission message");
     receiver.socket.emit(receiver.session + "/inputPermission", JSON.stringify(inputPermissionMessage));
   },
 
   onInputPermissionResult: function (registerItem, inputPermissionMessage, receiver, inputPermissionResult) {
     if (!inputPermissionResult.allow) {
-      clientinfologger(inputPermissionMessage, "sending not refused inputPermission message");
+      clientInfoLogger(inputPermissionMessage, "sending not refused inputPermission message");
       this.sendErrorInputPermissionResult(registerItem, inputPermissionMessage, "client refused:" + inputPermissionResult.reason);
       return;
     }
     const inputMessageListener = function (inputMessage) {
 
-      clientinfologger(inputPermissionMessage, "forwarding the input message");
+      clientInfoLogger(inputPermissionMessage, "forwarding the input message");
       receiver.socket.emit(receiver.session + "/input", inputMessage);
     };
     const reverseInputMessageListener = function (inputMessage) {
 
-      clientinfologger(inputPermissionMessage, "forwarding the reverse input message");
+      clientInfoLogger(inputPermissionMessage, "forwarding the reverse input message");
 
       registerItem.socket.emit(receiver.session + "/input", inputMessage);
     }
     const outputMessageListener = function (outputMessage) {
 
-      clientinfologger(inputPermissionMessage, "forwarding the output message");
+      clientInfoLogger(inputPermissionMessage, "forwarding the output message");
       registerItem.socket.emit(receiver.session + "/output", outputMessage);
     }
 
@@ -337,7 +392,7 @@ var globalInputMessenger = {
       inputPermissionMessage.allow = false;
       inputPermissionMessage.reason = "received disconnected";
       registerItem.socket.emit(receiver.session + "/leave", JSON.stringify(inputPermissionMessage));
-      clientinfologger(inputPermissionMessage, "inputMessage messageListener is removed");
+      clientInfoLogger(inputPermissionMessage, "inputMessage messageListener is removed");
 
     });
     registerItem.socket.on("disconnect", function () {
@@ -345,20 +400,20 @@ var globalInputMessenger = {
       receiver.socket.removeListener(receiver.session + "/output", outputMessageListener);
       receiver.socket.emit(receiver.session + "/leave", JSON.stringify(inputPermissionMessage));
 
-      clientinfologger(inputPermissionMessage, "reverse inputMessage messageListener is removed");
+      clientInfoLogger(inputPermissionMessage, "reverse inputMessage messageListener is removed");
 
 
     });
-    this.sendSucessInputPermissionResult(registerItem, receiver, inputPermissionResult);
+    this.sendSuccessInputPermissionResult(registerItem, receiver, inputPermissionResult);
   },
-  sendSucessInputPermissionResult(registerItem, receiver, inputPermissionResult) {
+  sendSuccessInputPermissionResult(registerItem, receiver, inputPermissionResult) {
     registerItem.socket.emit(receiver.session + "/inputPermissionResult", JSON.stringify(inputPermissionResult));
   },
   sendErrorInputPermissionResult(registerItem, inputPermissionMessage, reason) {
     inputPermissionMessage.allow = false;
     inputPermissionMessage.reason = reason;
     registerItem.socket.emit(inputPermissionMessage.connectSession + "/inputPermissionResult", JSON.stringify(inputPermissionMessage));
-    clientinfologger(inputPermissionMessage, "input Permisson is not allowed:" + reason);
+    clientInfoLogger(inputPermissionMessage, "input Permisson is not allowed:" + reason);
   }
 };
 module.exports = globalInputMessenger;

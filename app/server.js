@@ -23,5 +23,5 @@ app.get("/global-input/request-socket-url", globalInputMessenger.requestSocketSe
 
 
 var httpServer = http.listen(globalInputMessenger.config.port, function () {
-  console.log("websocket is listenning on:" + globalInputMessenger.config.port);
+  console.log("websocket is listening on:" + globalInputMessenger.config.port);
 });
