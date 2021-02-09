@@ -8,18 +8,7 @@ var winstonLogger = new (winston.Logger)({
   ]
 });
 
-function parseVideoConnect(clientId) {
-  let mediaHost = null;
-  let mediaRole = null;
-  if (clientId && clientId.startsWith('video://')) {
-    let res = clientId.slice('video://'.length);
-    mediaHost = res.slice(0, res.indexOf('/'));
-    res = res.slice(res.indexOf('/') + 1);
-    mediaRole = res.slice(0, res.indexOf('/'));
 
-  }
-  return { mediaHost, mediaRole };
-}
 
 var clientInfoLogger = function (request, message, extraInfo) {
   if (request && request.client) {
@@ -68,12 +57,12 @@ var globalInputMessenger = {
     else {
       this.ioNamespace = io;
     }
-    console.log("Copyright © 2017-2022 by Dilshat Hewzulla");
+    winstonLogger.log('info', "Global Input App (https://globalinput.co.uk), Copyright © 2017-2022 Iterative Solution Limited");
     this.ioNamespace.on("connect", this.onConnect.bind(this));
   },
   processArguments: function (argv) {
     var pathToConfigFile = minimist(argv).config;
-    console.log("pathToConfigFile:" + pathToConfigFile);
+    winstonLogger.log('info', "config File", { configFile: pathToConfigFile });
     if (!pathToConfigFile) {
       this.configPath = "config/config.json";
 
@@ -155,6 +144,108 @@ var globalInputMessenger = {
   processError: function (error, message) {
     winstonLogger.log('error', message, { error });
   },
+
+  parseMediaClientId: function (clientId) {
+
+    try {
+
+      if (clientId && clientId.startsWith('video://')) {
+        let res = clientId.slice('video://'.length);
+        mediaChannel = res.slice(0, res.indexOf('/'));
+        res = res.slice(res.indexOf('/') + 1);
+        mediaRole = res.slice(0, res.indexOf('/'));
+        const mediaType = "video";
+        return { mediaType, mediaChannel, mediaRole };
+      }
+
+    }
+    catch (error) {
+      this.processError(error, " parsing media client:" + error);
+    }
+    return null;
+  },
+  isVideoMediaClient: function (mediaRegistry) {
+
+    return mediaRegistry && mediaRegistry.mediaProperty && mediaRegistry.mediaProperty.mediaType === 'video';
+  },
+  isVideoProducer: function (mediaRegistry) {
+    return this.isVideoMediaClient(mediaRegistry) && mediaRegistry.mediaProperty.mediaRole === 'producer';
+  },
+  isVideoConsumer: function (mediaRegistry) {
+    return this.isVideoMediaClient(mediaRegistry) && mediaRegistry.mediaProperty.mediaRole === 'consumer';
+  },
+  findMediaProducerClient: function (mediaRegistry) {
+    for (let [key, value] of this.registry) {
+      if (this.isVideoProducer(value) && mediaRegistry.mediaProperty.mediaChannel === value.mediaProperty.mediaChannel) {
+        return value;
+      }
+    }
+    console.log("no media producer for:" + mediaRegistry.mediaProperty.mediaChannel);
+    return null;
+
+  },
+  findMediaConsumerClients: function (mediaRegistry) {
+    const mediaConsumers = [];
+    for (let [key, value] of this.registry) {
+      if (this.isVideoConsumer(value) && mediaRegistry.mediaChannel === value.mediaChannel) {
+        mediaConsumers.push(value);
+      }
+    }
+    return mediaConsumers;
+  },
+  onMediaClientClose: function (registerItem) {
+    if (!registerItem.mediaProperty) {
+      return;
+    }
+    try {
+      const producer = this.findMediaProducerClient(registerItem);
+      if (producer) {
+        registerItem.socket.to(producer.socket.id).emit("video/receiver/disconnected", registerItem.socket.id);
+      }
+
+    }
+    catch (error) {
+      this.processError(error, " onMediaClientClose:" + error);
+    }
+  },
+  initResisterMediaClient: function (registerItem) {
+    if ((!this.isVideoConsumer(registerItem)) && (!this.isVideoProducer(registerItem))) {
+      return;
+    }
+    winstonLogger.log('info', "****a new media client is registered", { mediaProperty: registerItem.mediaProperty })
+    var that = this;
+    this.isVideoProducer(registerItem) && registerItem.socket.on("video/video-ready", () => {
+      try {
+        const mediaConsumers = that.findMediaConsumerClients(registerItem);
+        mediaConsumers.forEach(consumer => {
+          consumer.socket.emit('video/video-ready');
+        });
+      }
+      catch (error) {
+        that.processError(error, " failed to process video/video-read " + error);
+      }
+    });
+
+    this.isVideoConsumer(registerItem) && registerItem.socket.on("video/watch", () => {
+      const producer = that.findMediaProducerClient(registerItem);
+      if (producer) {
+        registerItem.socket.to(producer.socket.id).emit("video/watch", registerItem.socket.id);
+      }
+
+
+    });
+    this.isVideoProducer(registerItem) && registerItem.socket.on("video/watchResponse", (id, message) => {
+      registerItem.socket.to(id).emit("video/watchResponse", registerItem.socket.id, message);
+    });
+    this.isVideoConsumer(registerItem) && registerItem.socket.on("video/watching", (id, message) => {
+      registerItem.socket.to(id).emit("video/watching", registerItem.socket.id, message);
+    });
+    registerItem.socket.on("video/candidate", (id, message) => {
+      registerItem.socket.to(id).emit("video/candidate", registerItem.socket.id, message);
+    });
+
+  },
+
   getApplicationByApikey: function (apikey) {
     var matched = this.config.applications.filter((app) => app.apikey === apikey);
     if (matched.length === 0) {
@@ -210,16 +301,6 @@ var globalInputMessenger = {
       winstonLogger.log('error', "failed to send register-denied message", { error });
     }
   },
-  findRegisteredItemsByClientRole: function (roleToMatch) {
-    const matched = [];
-    for (let [key, value] of this.registry) {
-      const { mediaHost, mediaRole } = parseVideoConnect(value.client);
-      if (mediaRole === roleToMatch) {
-        matched.push(value);
-      }
-    }
-    return matched;
-  },
   onRegister: function (socket, request) {
 
     var matchedApplication = this.getApplicationByApikey(request.apikey);
@@ -249,19 +330,13 @@ var globalInputMessenger = {
       securityGroup: request.securityGroup,
       session: request.session,
       client: request.client,
-      time: new Date()
+      time: new Date(),
+      mediaProperty: that.parseMediaClientId(request.client)
     };
-    const { mediaHost, mediaRole } = parseVideoConnect(registerItem.client);
     this.registry.set(registerItem.session, registerItem);
     socket.on("disconnect", function () {
-      if (mediaHost && mediaRole) {
-        const senders = that.findRegisteredItemsByClientRole('sender');
-        senders.forEach(s => {
-          socket.to(s.socket.id).emit("video/receiver/disconnected", socket.id);
-        });
-      }
+      that.onMediaClientClose(registerItem);
       that.registry.delete(registerItem.session);
-
       clientInfoLogger(request, "removed from the registry", { session: registerItem.session, size: that.registry.size });
     });
     clientInfoLogger(request, "registered", { session: registerItem.session, size: this.registry.size });
@@ -277,32 +352,7 @@ var globalInputMessenger = {
       }
       socket.removeAllListeners("inputPermision");
     });
-    if (mediaHost && mediaRole) {
-      socket.on("video/video-ready", () => {
-        socket.broadcast.emit("video/video-ready");
-      });
-      socket.on("video/watch", () => {
-        const senders = that.findRegisteredItemsByClientRole('sender');
-        senders.forEach(s => {
-          socket.to(s.socket.id).emit("video/watch", socket.id);
-        });
-
-      });
-      socket.on("video/ask", (id, message) => {
-        socket.to(id).emit("video/ask", socket.id, message);
-      });
-      socket.on("video/answer", (id, message) => {
-        socket.to(id).emit("video/answer", socket.id, message);
-      });
-      socket.on("video/candidate", (id, message) => {
-        socket.to(id).emit("video/candidate", socket.id, message);
-      });
-
-
-    }
-
-
-
+    that.initResisterMediaClient(registerItem);
     var registeredMessage = {
       result: "ok",
     }
