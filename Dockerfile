@@ -1,5 +1,5 @@
 # Base Docker image
-FROM node:8.1.2
+FROM node:16
 
 # The application port.
 EXPOSE 1337
