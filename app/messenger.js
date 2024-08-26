@@ -464,6 +464,15 @@ var globalInputMessenger = {
     inputPermissionMessage.reason = reason;
     registerItem.socket.emit(inputPermissionMessage.connectSession + "/inputPermissionResult", JSON.stringify(inputPermissionMessage));
     clientInfoLogger(inputPermissionMessage, "input Permisson is not allowed:" + reason);
+  },
+  loadIndexFile: function (req, res) {
+    res.sendFile(__dirname + "/default.html");
   }
+
 };
+
+
+
+
+
 module.exports = globalInputMessenger;
