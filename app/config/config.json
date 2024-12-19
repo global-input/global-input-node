@@ -1,16 +1,19 @@
 {
- "port":1337,
- "applications":[{
-    "name":"default",
-    "apikey":"k7jc3QcMPKEXGW5UC",
-    "url":"https://node3.globalinput.co.uk"
-   }
- ],
- "namespace":"",
- "winston":{
-   "logLevel":"info"
- },
- "node":{
-   "accept":["default"]
- }
+  "port": 1337,
+  "applications": [
+    {
+      "name": "default",
+      "apikey": "k7jc3QcMPKEXGW5UC",
+      "url": "https://tnode1.globalinput.co.uk"
+    }
+  ],
+  "namespace": "",
+  "winston": {
+    "logLevel": "info"
+  },
+  "node": {
+    "accept": [
+      "default"
+    ]
+  }
 }
