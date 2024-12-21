@@ -120,6 +120,51 @@ var globalInputMessenger = {
 
 
   },
+  appLaunched: function (req, res) {
+    const session= req.query.session;
+    const code= req.query.code;
+    if((!session) ||(!code)){
+      winstonLogger.log('info', "appLaunched: session or code not found", { session, code });
+      res.writeHead(401, httpResponseHeader);
+      var data = {
+        result: "failed",
+        reason:"session or code not found"
+      };
+      res.end(JSON.stringify(data));
+      return;
+    }
+    const registeredItem=this.registry.get(session);
+    if(!registeredItem){
+      winstonLogger.log('info', "appLaunched: session not found", { session });
+      res.writeHead(401, httpResponseHeader);
+      var data = {
+        result: "failed",
+        reason:"session not found"
+      };
+      res.end(JSON.stringify(data));
+      return;
+    }
+    if(!registeredItem.socket){
+      winstonLogger.log('info', "appLaunched: socket not found", { session });
+      res.writeHead(401, httpResponseHeader);
+      var data = {
+        result: "failed",
+        reason:"socket not found"
+      };
+      res.end(JSON.stringify(data));
+      return;
+    }
+    winstonLogger.log('info', "appLaunched: session found", { session });    
+    const msg={
+          code
+    }
+    registeredItem.socket.emit("app/launched",JSON.stringify(msg));    
+    res.writeHead(200, httpResponseHeader);
+    var data = {
+      result: "ok"
+    };
+    res.end(JSON.stringify(data));
+  },
   socketServerGranted: function (req, res, application) {
     res.writeHead(200, httpResponseHeader);
     var data = {
@@ -355,6 +400,9 @@ var globalInputMessenger = {
     that.initResisterMediaClient(registerItem);
     var registeredMessage = {
       result: "ok",
+      registeredInfo:{
+        session: registerItem.session
+      }
     }
     clientInfoLogger(request, "registered message is sent");
     socket.emit("registered", JSON.stringify(registeredMessage));
