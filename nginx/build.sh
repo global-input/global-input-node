@@ -15,4 +15,4 @@ rsync -azvv  ../global-input-web/build/ $working_dir/var/www/html/
 cd $working_dir
 pwd
 
-docker build -t dilshat/global_input_nginx .
+docker build --platform linux/amd64 -t dilshat/global_input_nginx .
