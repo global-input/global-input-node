@@ -57,7 +57,7 @@ var globalInputMessenger = {
     else {
       this.ioNamespace = io;
     }
-    winstonLogger.log('info', "Global Input App (https://globalinput.co.uk), Copyright © 2017-2022 Iterative Solution Limited");
+    winstonLogger.log('info', "Global Input App (https://globalinput.co.uk), Copyright © 2017-2025 Iterative Solution Limited");
     this.ioNamespace.on("connect", this.onConnect.bind(this));
   },
   processArguments: function (argv) {
