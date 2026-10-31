@@ -18,7 +18,7 @@
   "homepage": "https://github.com/global-input/global-input-node#readme",
   "dependencies": {
     "body-parser": "^1.18.3",
-    "express": "^4.16.3",
+    "express": "^4.17.3",
     "http": "0.0.0",
     "minimist": "^1.2.2",
     "qrcode": "^0.9.0",
