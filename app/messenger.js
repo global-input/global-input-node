@@ -182,10 +182,6 @@ var globalInputMessenger = {
     res.end(JSON.stringify(data));
   },
 
-  logger: function (err, req, res, next) {
-    winstonLogger.log('info', "request received");
-    next(err)
-  },
   processError: function (error, message) {
     winstonLogger.log('error', message, { error });
   },
@@ -232,7 +228,7 @@ var globalInputMessenger = {
   findMediaConsumerClients: function (mediaRegistry) {
     const mediaConsumers = [];
     for (let [key, value] of this.registry) {
-      if (this.isVideoConsumer(value) && mediaRegistry.mediaChannel === value.mediaChannel) {
+      if (this.isVideoConsumer(value) && mediaRegistry.mediaProperty.mediaChannel === value.mediaProperty.mediaChannel) {
         mediaConsumers.push(value);
       }
     }
@@ -381,7 +377,10 @@ var globalInputMessenger = {
     this.registry.set(registerItem.session, registerItem);
     socket.on("disconnect", function () {
       that.onMediaClientClose(registerItem);
-      that.registry.delete(registerItem.session);
+      // a reconnecting client may already have replaced this entry with its new socket
+      if (that.registry.get(registerItem.session) === registerItem) {
+        that.registry.delete(registerItem.session);
+      }
       clientInfoLogger(request, "removed from the registry", { session: registerItem.session, size: that.registry.size });
     });
     clientInfoLogger(request, "registered", { session: registerItem.session, size: this.registry.size });
@@ -453,8 +452,13 @@ var globalInputMessenger = {
         that.sendErrorInputPermissionResult(registerItem, inputPermissionMessage, error);
       }
       receiver.socket.removeListener(receiver.session + "/inputPermissionResult", onInputPermissionResult);
+      registerItem.socket.removeListener("disconnect", onRequesterDisconnect);
+    };
+    var onRequesterDisconnect = function () {
+      receiver.socket.removeListener(receiver.session + "/inputPermissionResult", onInputPermissionResult);
     };
     receiver.socket.on(receiver.session + "/inputPermissionResult", onInputPermissionResult);
+    registerItem.socket.on("disconnect", onRequesterDisconnect);
     clientInfoLogger(inputPermissionMessage, "sending inputPermission message");
     receiver.socket.emit(receiver.session + "/inputPermission", JSON.stringify(inputPermissionMessage));
   },
@@ -485,23 +489,27 @@ var globalInputMessenger = {
     registerItem.socket.on(receiver.session + "/input", inputMessageListener);
     receiver.socket.on(receiver.session + "/input", reverseInputMessageListener);
     receiver.socket.on(receiver.session + "/output", outputMessageListener);
-    receiver.socket.on("disconnect", function () {
+    const onReceiverDisconnect = function () {
       registerItem.socket.removeListener(receiver.session + "/input", inputMessageListener);
+      registerItem.socket.removeListener("disconnect", onSenderDisconnect);
       inputPermissionMessage.allow = false;
       inputPermissionMessage.reason = "received disconnected";
       registerItem.socket.emit(receiver.session + "/leave", JSON.stringify(inputPermissionMessage));
       clientInfoLogger(inputPermissionMessage, "inputMessage messageListener is removed");
 
-    });
-    registerItem.socket.on("disconnect", function () {
+    };
+    const onSenderDisconnect = function () {
       receiver.socket.removeListener(receiver.session + "/input", reverseInputMessageListener);
       receiver.socket.removeListener(receiver.session + "/output", outputMessageListener);
+      receiver.socket.removeListener("disconnect", onReceiverDisconnect);
       receiver.socket.emit(receiver.session + "/leave", JSON.stringify(inputPermissionMessage));
 
       clientInfoLogger(inputPermissionMessage, "reverse inputMessage messageListener is removed");
 
 
-    });
+    };
+    receiver.socket.on("disconnect", onReceiverDisconnect);
+    registerItem.socket.on("disconnect", onSenderDisconnect);
     this.sendSuccessInputPermissionResult(registerItem, receiver, inputPermissionResult);
   },
   sendSuccessInputPermissionResult(registerItem, receiver, inputPermissionResult) {
