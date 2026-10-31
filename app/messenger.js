@@ -445,7 +445,12 @@ var globalInputMessenger = {
 
 
       try {
-        that.onInputPermissionResult(registerItem, inputPermissionMessage, receiver, JSON.parse(data));
+        const inputPermissionResult = JSON.parse(data);
+        // each waiting phone has its own listener on this event, so skip answers meant for another phone
+        if (inputPermissionResult.session !== inputPermissionMessage.session) {
+          return;
+        }
+        that.onInputPermissionResult(registerItem, inputPermissionMessage, receiver, inputPermissionResult);
       }
       catch (error) {
         clientInfoLogger(inputPermissionMessage, error + " in  processJoinRequestResult");
